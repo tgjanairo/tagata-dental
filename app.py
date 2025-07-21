@@ -4,7 +4,10 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from auth import login_required, admin_required
 from datetime import datetime
-import os  # ✅ ADD THIS
+import os
+from dotenv import load_dotenv
+from pymongo import MongoClient
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "tagata-dental-2025-secret-key"
@@ -551,4 +554,4 @@ def update_treatment_inline(treatment_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=10000)
