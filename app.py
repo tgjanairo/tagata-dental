@@ -6,8 +6,8 @@ from auth import login_required, admin_required
 from datetime import datetime
 import os
 from dotenv import load_dotenv
-from pymongo import MongoClient
 load_dotenv()
+
 
 app = Flask(__name__)
 app.secret_key = "tagata-dental-2025-secret-key"
@@ -551,6 +551,19 @@ def update_treatment_inline(treatment_id):
     # Get patient ID to redirect back to patient profile
     treatment = treatments_col.find_one({"_id": ObjectId(treatment_id)})
     return redirect(url_for("view_patient", patient_id=treatment["patient_id"], _anchor="treatment"))
+
+
+@app.route("/create-admin")
+def create_admin():
+    if users_col.find_one({"email": "admin@example.com"}):
+        return "👤 Admin already exists"
+
+    users_col.insert_one({
+        "email": "admin@example.com",
+        "password": generate_password_hash("admin123"),
+        "role": "admin"
+    })
+    return "✅ Admin created"
 
 
 if __name__ == "__main__":
