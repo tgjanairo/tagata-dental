@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="text-primary fw-bold mb-4">
+    <i class="bi bi-plus-circle me-2"></i> Add Treatment Record
+  </h2>
+
+  <form method="POST" class="card shadow rounded-4 p-4 bg-light">
+    <div class="mb-3">
+      <label for="patient_id" class="form-label">Select Patient</label>
+      <select name="patient_id" id="patient_id" class="form-select" required>
+        {% for p in patients %}
+          <option value="{{ p._id }}">{{ p.first_name }} {{ p.last_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="treatment" class="form-label">Treatment Type</label>
+      <input type="text" class="form-control" name="treatment" required>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col">
+        <label class="form-label">Fee (₱)</label>
+        <input type="number" name="fee" class="form-control" required>
+      </div>
+      <div class="col">
+        <label class="form-label">Paid (₱)</label>
+        <input type="number" name="paid" class="form-control" required>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="date" class="form-label">Date</label>
+      <input type="date" class="form-control" name="date" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+      <i class="bi bi-save"></i> Save Treatment
+    </button>
+  </form>
+</div>
+{% endblock %}

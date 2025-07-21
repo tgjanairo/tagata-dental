@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <h3 class="text-primary fw-bold mb-4">
+    <i class="bi bi-person-plus-fill me-2"></i> Add Patient Information
+  </h3>
+
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast text-white bg-{{ 'success' if category == 'success' else 'danger' }} border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body">
+                <i class="bi {{ 'bi-check-circle' if category == 'success' else 'bi-exclamation-circle' }} me-2"></i>
+                {{ message }}
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <form method="POST" onsubmit="disableButton()" class="needs-validation" novalidate>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="last_name" class="form-label">Last Name</label>
+        <input type="text" class="form-control" name="last_name" required>
+        <div class="invalid-feedback">Required</div>
+      </div>
+      <div class="col-md-4">
+        <label for="first_name" class="form-label">First Name</label>
+        <input type="text" class="form-control" name="first_name" required>
+        <div class="invalid-feedback">Required</div>
+      </div>
+      <div class="col-md-4">
+        <label for="middle_name" class="form-label">Middle Name</label>
+        <input type="text" class="form-control" name="middle_name">
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="birthdate" class="form-label">Birthdate</label>
+        <input type="date" class="form-control" name="birthdate" required>
+      </div>
+      <div class="col-md-4">
+        <label for="gender" class="form-label">Gender</label>
+        <select name="gender" class="form-select" required>
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="contact" class="form-label">Contact Number</label>
+        <input type="text" class="form-control" name="contact" required>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="address" class="form-label">Address</label>
+      <input type="text" class="form-control" name="address">
+    </div>
+
+    <div class="mb-3">
+      <label for="notes" class="form-label">Notes</label>
+      <textarea class="form-control" name="notes" rows="3"></textarea>
+    </div>
+
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" name="has_allergy" id="has_allergy">
+      <label class="form-check-label" for="has_allergy">
+        Does this patient have allergies?
+      </label>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="profession" class="form-label">Company</label>
+        <input type="text" class="form-control" name="profession">
+      </div>
+      <div class="col-md-6">
+        <label for="identification" class="form-label">Identification No.</label>
+        <input type="text" class="form-control" name="identification">
+      </div>
+    </div>
+
+    <div class="mb-3 mt-4">
+      <h5 class="text-purple">
+        <i class="fas fa-exclamation-triangle text-warning"></i> In Case of Emergency
+      </h5>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <label for="emergency_contact" class="form-label">Contact Person Name</label>
+        <input type="text" class="form-control" name="emergency_contact">
+      </div>
+      <div class="col-md-6">
+        <label for="emergency_number" class="form-label">Contact Number</label>
+        <input type="text" class="form-control" name="emergency_number">
+      </div>
+    </div>
+
+    <div class="text-center">
+      <button type="submit" id="saveBtn" class="btn btn-primary me-2">
+        <i class="fas fa-save"></i> Save
+      </button>
+      <a href="{{ url_for('list_patients') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<!-- Toast + Form Validation Script -->
+<script>
+  function disableButton() {
+    const btn = document.getElementById("saveBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+  }
+
+  // Bootstrap form validation
+  (() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+
+  // Auto-hide toast after 4 seconds
+  document.addEventListener('DOMContentLoaded', () => {
+    const toasts = document.querySelectorAll('.toast');
+    toasts.forEach(toastEl => {
+      const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+      toast.show();
+    });
+  });
+</script>
+{% endblock %}

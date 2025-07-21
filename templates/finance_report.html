@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-4">
+
+  <h2 class="fw-bold text-primary mb-4">
+    <i class="bi bi-wallet-fill me-2"></i> Finance Report
+  </h2>
+
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card bg-primary text-white shadow rounded-4">
+        <div class="card-body">
+          <h5><i class="bi bi-cash-coin me-2"></i> Total Revenue</h5>
+          <h3 class="fw-bold">₱{{ "{:,.2f}".format(total_fee) }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-success text-white shadow rounded-4">
+        <div class="card-body">
+          <h5><i class="bi bi-check-circle-fill me-2"></i> Total Paid</h5>
+          <h3 class="fw-bold">₱{{ "{:,.2f}".format(total_paid) }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-warning text-dark shadow rounded-4">
+        <div class="card-body">
+          <h5><i class="bi bi-exclamation-circle-fill me-2"></i> Pending Balance</h5>
+          <h3 class="fw-bold">₱{{ "{:,.2f}".format(pending_balance) }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Actions -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0 text-secondary">All Treatment Records</h5>
+    <a href="{{ url_for('add_new_treatment') }}" class="btn btn-outline-primary btn-sm">
+
+    <i class="bi bi-plus"></i> Add Treatment
+  </a>
+    <a href="#" class="btn btn-outline-secondary btn-sm disabled">
+      <i class="bi bi-download"></i> Export (Coming Soon)
+    </a>
+  </div>
+
+  <!-- Treatment Records Table -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Patient</th>
+            <th>Treatment</th>
+            <th class="text-end">Fee (₱)</th>
+            <th class="text-end">Paid (₱)</th>
+            <th class="text-end">Balance (₱)</th>
+          </tr>
+        </thead>
+        <tbody>
+  {% for t in treatments %}
+  <tr>
+    <form method="POST" action="{{ url_for('update_treatment_from_report', treatment_id=t._id) }}">
+      <td>{{ t.date }}</td>
+      <td>{{ t.patient_name }}</td>
+      <td><input type="text" name="treatment" class="form-control form-control-sm" value="{{ t.treatment }}"></td>
+      <td><input type="number" step="0.01" name="fee" class="form-control form-control-sm text-end" value="{{ t.fee }}"></td>
+      <td><input type="number" step="0.01" name="paid" class="form-control form-control-sm text-end" value="{{ t.paid }}"></td>
+      <td class="text-end">
+        <strong class="{% if (t.fee - t.paid) > 0 %}text-danger{% else %}text-success{% endif %}">
+          ₱{{ "{:,.2f}".format(t.fee - t.paid) }}
+        </strong>
+      </td>
+      <td>
+        <button type="submit" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-save"></i>
+        </button>
+      </td>
+    </form>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="text-center py-3">No treatment records found.</td></tr>
+  {% endfor %}
+</tbody>
+
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

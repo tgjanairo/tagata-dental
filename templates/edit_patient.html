@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-4">
+  <h3 class="text-primary fw-bold mb-4">
+    <i class="bi bi-pencil-square me-2"></i> Edit Patient
+  </h3>
+
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast align-items-center text-white bg-{{ 'success' if category == 'success' else 'danger' }} border-0 show mb-2" role="alert">
+            <div class="d-flex">
+              <div class="toast-body">
+                <i class="bi {{ 'bi-check-circle' if category == 'success' else 'bi-exclamation-circle' }} me-2"></i>
+                {{ message }}
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <form method="POST" action="{{ url_for('edit_patient', patient_id=patient._id) }}" class="needs-validation" novalidate>
+    <div class="row g-3">
+      <!-- Name -->
+      <div class="col-md-4">
+        <label>Last Name</label>
+        <input type="text" class="form-control" name="last_name" value="{{ patient.last_name }}" required>
+        <div class="invalid-feedback">Required</div>
+      </div>
+      <div class="col-md-4">
+        <label>First Name</label>
+        <input type="text" class="form-control" name="first_name" value="{{ patient.first_name }}" required>
+        <div class="invalid-feedback">Required</div>
+      </div>
+      <div class="col-md-4">
+        <label>Middle Name</label>
+        <input type="text" class="form-control" name="middle_name" value="{{ patient.middle_name }}">
+      </div>
+
+      <!-- Info -->
+      <div class="col-md-4">
+        <label>Birthdate</label>
+        <input type="date" class="form-control" name="birthdate" value="{{ patient.birthdate }}">
+      </div>
+      <div class="col-md-4">
+        <label>Gender</label>
+        <select class="form-select" name="gender">
+          <option value="">Select Gender</option>
+          <option value="Male" {{ 'selected' if patient.gender == 'Male' else '' }}>Male</option>
+          <option value="Female" {{ 'selected' if patient.gender == 'Female' else '' }}>Female</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label>Contact Number</label>
+        <input type="text" class="form-control" name="contact" value="{{ patient.contact }}">
+      </div>
+
+      <!-- Address & Company -->
+      <div class="col-12">
+        <label>Address</label>
+        <input type="text" class="form-control" name="address" value="{{ patient.address }}">
+      </div>
+      <div class="col-12">
+        <label>Company</label>
+        <input type="text" class="form-control" name="company" value="{{ patient.company }}">
+      </div>
+
+      <!-- Identification -->
+      <div class="col-md-6">
+        <label>Identification No.</label>
+        <input type="text" class="form-control" name="identification_no" value="{{ patient.identification_no }}">
+      </div>
+
+      <!-- Allergy Checkbox -->
+      <div class="col-12">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="hasAllergy" name="has_allergy" {% if patient.has_allergy %}checked{% endif %}>
+          <label class="form-check-label" for="hasAllergy">Does this patient have allergies?</label>
+        </div>
+      </div>
+
+      <!-- Allergy Text -->
+      <div class="col-12" id="allergyInput" style="display: {% if patient.has_allergy %}block{% else %}none{% endif %};">
+        <label>List of Allergies</label>
+        <input type="text" class="form-control" name="allergies" value="{% if patient.allergies is string %}{{ patient.allergies }}{% elif patient.allergies %}{{ patient.allergies | join(', ') }}{% endif %}">
+        <small class="text-muted">Separate multiple allergies with commas.</small>
+      </div>
+
+      <!-- Notes -->
+      <div class="col-12">
+        <label>Notes</label>
+        <textarea class="form-control" name="notes" rows="3">{{ patient.notes }}</textarea>
+      </div>
+    </div>
+
+    <!-- Emergency Contact -->
+    <div class="mt-4">
+      <h5 class="text-purple fw-bold">In Case of Emergency</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label>Contact Person Name</label>
+          <input type="text" class="form-control" name="emergency_contact_name" value="{{ patient.emergency_contact_name }}">
+        </div>
+        <div class="col-md-6">
+          <label>Contact Number</label>
+          <input type="text" class="form-control" name="emergency_contact_number" value="{{ patient.emergency_contact_number }}">
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-4 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{{ url_for('list_patients') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<!-- Scripts -->
+<script>
+  const hasAllergy = document.getElementById("hasAllergy");
+  const allergyInput = document.getElementById("allergyInput");
+
+  hasAllergy.addEventListener("change", () => {
+    allergyInput.style.display = hasAllergy.checked ? "block" : "none";
+  });
+
+  // Bootstrap validation
+  (() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-4 text-primary fw-bold">
+    <i class="bi bi-calendar3 me-2"></i> Appointment Calendar
+  </h3>
+
+  <!-- Calendar Container -->
+  <div id="calendar" class="border rounded bg-white shadow-sm p-2"></div>
+</div>
+
+<!-- FullCalendar & Tooltip Script -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const calendarEl = document.getElementById("calendar");
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      height: "auto",
+      events: "/appointments/json",
+
+      eventClick: function (info) {
+        const appointmentId = info.event.id;
+        if (appointmentId) {
+          window.location.href = `/appointments/view/${appointmentId}`;
+        }
+      },
+
+      eventDidMount: function (info) {
+        const tooltip = `
+          <strong>${info.event.title}</strong><br>
+          Time: ${info.event.extendedProps.time || 'N/A'}<br>
+          Dentist: ${info.event.extendedProps.dentist || 'N/A'}<br>
+          Note: ${info.event.extendedProps.note || 'N/A'}
+        `;
+        new bootstrap.Tooltip(info.el, {
+          title: tooltip,
+          html: true,
+          placement: "top",
+          trigger: "hover"
+        });
+      }
+    });
+
+    calendar.render();
+  });
+</script>
+{% endblock %}

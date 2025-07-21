@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3 class="text-primary fw-bold mb-4">
+    <i class="bi bi-calendar-check me-2"></i> Appointment Details
+  </h3>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <p><strong>Date:</strong> {{ appointment.date }}</p>
+      <p><strong>Time:</strong> {{ appointment.time }}</p>
+      <p><strong>Patient:</strong> {{ appointment.patient_name }}</p>
+      <p><strong>Dentist:</strong> {{ appointment.dentist }}</p>
+      <p><strong>Status:</strong> {{ appointment.status }}</p>
+      <p><strong>Note:</strong> {{ appointment.note or '—' }}</p>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <a href="{{ url_for('view_appointments') }}" class="btn btn-secondary me-2">
+      <i class="bi bi-list-check"></i> Back to All Appointments
+    </a>
+    <a href="{{ url_for('calendar') }}" class="btn btn-outline-primary">
+      <i class="bi bi-calendar"></i> Back to Calendar
+    </a>
+  </div>
+</div>
+{% endblock %}

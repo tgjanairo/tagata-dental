@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast text-white bg-{{ 'success' if category == 'success' else 'danger' }} border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body">
+                <i class="bi {{ 'bi-check-circle' if category == 'success' else 'bi-exclamation-circle' }} me-2"></i>
+                {{ message }}
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Page Header -->
+  <div class="mb-4">
+    <h2 class="fw-bold text-primary">
+      <i class="bi bi-calendar-plus me-2"></i> Add Appointment
+    </h2>
+  </div>
+
+  <!-- Appointment Form Card -->
+  <div class="card shadow rounded-4 border-0">
+    <div class="card-body p-4">
+      <form method="POST" class="needs-validation" novalidate>
+
+        <!-- Patient Selection -->
+        <div class="mb-3">
+          <label for="patient_name" class="form-label fw-semibold">Patient:</label>
+          <select name="patient_name" id="patient_name" class="form-select" required>
+            <option value="" disabled selected>Select Patient</option>
+            {% for p in patients %}
+              <option value="{{ p.first_name }} {{ p.last_name }}">{{ p.first_name }} {{ p.last_name }}</option>
+            {% endfor %}
+          </select>
+          <div class="invalid-feedback">Please select a patient.</div>
+        </div>
+
+        <!-- Dentist Name -->
+        <div class="mb-3">
+          <label for="dentist" class="form-label fw-semibold">Dentist:</label>
+          <input type="text" name="dentist" id="dentist" class="form-control" value="Terrence Janairo" required>
+          <div class="invalid-feedback">Please enter dentist name.</div>
+        </div>
+
+        <!-- Date and Time -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="date" class="form-label fw-semibold">Date:</label>
+            <input type="date" name="date" id="date" class="form-control" required>
+            <div class="invalid-feedback">Please select a date.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="time" class="form-label fw-semibold">Time:</label>
+            <input type="time" name="time" id="time" class="form-control" required>
+            <div class="invalid-feedback">Please select a time.</div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="mb-4">
+          <label for="note" class="form-label fw-semibold">Note:</label>
+          <textarea name="note" id="note" rows="3" class="form-control" placeholder="Enter any notes..."></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-primary px-4 shadow-sm">Save Appointment</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Toast + Validation Script -->
+<script>
+  // Bootstrap form validation
+  (() => {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+
+  // Show toasts on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    const toasts = document.querySelectorAll('.toast');
+    toasts.forEach(toastEl => {
+      const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+      toast.show();
+    });
+  });
+</script>
+{% endblock %}

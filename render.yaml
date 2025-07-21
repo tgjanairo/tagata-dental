@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: edntal-app
+    env: python
+    buildCommand: ""
+    startCommand: "gunicorn app:app"
+    plan: free
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: MONGO_URI
+        value: <your MongoDB Atlas connection string>

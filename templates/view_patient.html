@@ -1,0 +1,250 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold text-primary">
+      <i class="bi bi-person-circle me-2"></i> {{ patient.first_name }} {{ patient.last_name }}
+    </h3>
+    <a href="{{ url_for('edit_patient', patient_id=patient._id) }}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-pencil"></i> Edit
+    </a>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3" id="patientTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Personal Info</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tooth-tab" data-bs-toggle="tab" data-bs-target="#tooth" type="button" role="tab">Tooth Chart</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="treatment-tab" data-bs-toggle="tab" data-bs-target="#treatment" type="button" role="tab">Treatment Records</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="medical-tab" data-bs-toggle="tab" data-bs-target="#medical" type="button" role="tab">Medical History</button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="patientTabsContent">
+    <!-- Personal Info Tab -->
+    <div class="tab-pane fade show active" id="info" role="tabpanel">
+      <div class="row g-4 mt-2">
+        <div class="col-md-6">
+          <div class="card shadow-sm p-3">
+            <h6 class="fw-bold text-primary mb-2">Patient Details</h6>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"><strong>Gender:</strong> {{ patient.gender or 'N/A' }}</li>
+              <li class="list-group-item"><strong>Birthdate:</strong> {{ patient.birthdate or 'N/A' }}</li>
+              <li class="list-group-item"><strong>Contact:</strong> {{ patient.contact or 'N/A' }}</li>
+              <li class="list-group-item"><strong>Address:</strong> {{ patient.address or 'N/A' }}</li>
+              <li class="list-group-item"><strong>Company:</strong> {{ patient.company or 'N/A' }}</li>
+              <li class="list-group-item"><strong>ID No.:</strong> {{ patient.identification_no or 'N/A' }}</li>
+              <li class="list-group-item"><strong>Allergies:</strong>
+                {% if patient.has_allergy and patient.allergies %}
+                  {% if patient.allergies is string %}
+                    <span class="badge bg-danger">{{ patient.allergies }}</span>
+                  {% else %}
+                    {% for allergy in patient.allergies %}
+                      <span class="badge bg-danger me-1">{{ allergy }}</span>
+                    {% endfor %}
+                  {% endif %}
+                {% else %}
+                  <span class="badge bg-success">None</span>
+                {% endif %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tooth Chart Tab -->
+    <div class="tab-pane fade" id="tooth" role="tabpanel">
+      <div class="card p-3">
+        <h5 class="fw-bold mb-3 text-primary">Interactive Tooth Chart</h5>
+        <div class="tooth-container position-relative text-center">
+          <img src="{{ url_for('static', filename='images/tooth.png') }}" alt="Tooth Chart" class="img-fluid" style="max-height: 500px;">
+         {% for i in range(1, 17) %}
+        <div class="tooth-overlay" data-tooth="{{ i }}" style="top: 50px; left: {{ 60 + (i-1)*40 }}px;"></div>
+        <div class="tooth-label" style="top: 40px; left: {{ 60 + (i-1)*40 + 10 }}px;">{{ i }}</div>
+    {% endfor %}
+
+  {% for i in range(17, 33) %}
+  <div class="tooth-overlay" data-tooth="{{ i }}" style="top: 370px; left: {{ 60 + (i-17)*40 }}px;"></div>
+  <div class="tooth-label" style="top: 420px; left: {{ 60 + (i-17)*40 + 10 }}px;">{{ i }}</div>
+  {% endfor %}
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Treatment Tab -->
+    <div class="tab-pane fade" id="treatment" role="tabpanel">
+      <div class="card mt-4">
+        <div class="card-header bg-light"><strong>Treatment Records</strong></div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm text-center align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Diagnosis</th>
+                  <th>Treatment</th>
+                  <th>Fee</th>
+                  <th>Paid</th>
+                  <th>Balance</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+  {% for t in treatments %}
+  <tr>
+    <form method="POST" action="{{ url_for('update_treatment_inline', treatment_id=t._id) }}">
+      <td>{{ t.date }}</td>
+      <td><input type="text" name="diagnosis" class="form-control form-control-sm" value="{{ t.diagnosis }}"></td>
+      <td><input type="text" name="treatment" class="form-control form-control-sm" value="{{ t.treatment }}"></td>
+      <td><input type="number" step="0.01" name="fee" class="form-control form-control-sm text-end" value="{{ t.fee }}"></td>
+      <td><input type="number" step="0.01" name="paid" class="form-control form-control-sm text-end" value="{{ t.paid }}"></td>
+      <td class="text-end">
+        <strong class="{% if (t.fee - t.paid) > 0 %}text-danger{% else %}text-success{% endif %}">
+          ₱{{ "{:,.2f}".format(t.fee - t.paid) }}
+        </strong>
+      </td>
+      <td>
+        <button type="submit" class="btn btn-sm btn-outline-primary me-1">
+          <i class="bi bi-save"></i>
+        </button>
+        <form method="POST" action="{{ url_for('remove_treatment', treatment_id=t._id, patient_id=patient._id) }}" class="d-inline">
+          <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this record?')">
+            <i class="bi bi-trash"></i>
+          </button>
+        </form>
+      </td>
+    </form>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="text-center py-3">No treatment records found.</td></tr>
+  {% endfor %}
+</tbody>
+
+
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <strong>Add Treatment Record</strong>
+          <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTreatmentRow()">➕ Add Row</button>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('add_treatment', patient_id=patient._id) }}#treatment">
+            <div id="treatmentRows">
+              <div class="row g-2 treatment-row mb-3">
+                <div class="col-md-2"><input type="date" name="date[]" class="form-control" required></div>
+                <div class="col-md-2"><input type="text" name="diagnosis[]" class="form-control" placeholder="Diagnosis" required></div>
+                <div class="col-md-2"><input type="text" name="treatment[]" class="form-control" placeholder="Treatment" required></div>
+                <div class="col-md-2"><input type="number" name="fee[]" class="form-control fee" placeholder="Fee" required></div>
+                <div class="col-md-2"><input type="number" name="paid[]" class="form-control paid" placeholder="Paid" required></div>
+                <div class="col-md-2"><input type="number" name="balance[]" class="form-control balance" placeholder="Balance" readonly></div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Save All
+              </button>
+              <a href="{{ url_for('list_patients') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Back to List
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical History Tab -->
+    <div class="tab-pane fade" id="medical" role="tabpanel">
+      <div class="card mt-4">
+        <div class="card-header bg-light">
+          <strong>Medical History</strong>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('update_medical_history', patient_id=patient._id) }}#medical">
+            <ul class="list-group list-group-flush">
+              {% set mh = patient.medical_history or {} %}
+              {% for i in range(1, 8) %}
+              <li class="list-group-item">
+                <strong>{{ i }}.</strong> 
+                {{ [
+                  "Are you in good health?",
+                  "Are you under a physician's care?",
+                  "Are you taking any kind of medication at this time?",
+                  "Any illness you have ever?",
+                  "Trouble with prolonged bleeding after surgery?",
+                  "Unusual reaction to an anesthetic or drug?",
+                  "Any other information that should be known?"
+                ][i-1] }}
+                <input type="text" class="form-control mt-2" name="q{{ i }}" value="{{ mh['q' ~ i] or '' }}">
+              </li>
+              {% endfor %}
+            </ul>
+            <div class="mt-3 text-end">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Save Medical History
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Treatment Row Script -->
+<script>
+function addTreatmentRow() {
+  const container = document.getElementById("treatmentRows");
+  const newRow = document.createElement("div");
+  newRow.className = "row g-2 treatment-row mb-3";
+  newRow.innerHTML = `
+    <div class="col-md-2"><input type="date" name="date[]" class="form-control" required></div>
+    <div class="col-md-2"><input type="text" name="diagnosis[]" class="form-control" placeholder="Diagnosis" required></div>
+    <div class="col-md-2"><input type="text" name="treatment[]" class="form-control" placeholder="Treatment" required></div>
+    <div class="col-md-2"><input type="number" name="fee[]" class="form-control fee" placeholder="Fee" required></div>
+    <div class="col-md-2"><input type="number" name="paid[]" class="form-control paid" placeholder="Paid" required></div>
+    <div class="col-md-2"><input type="number" name="balance[]" class="form-control balance" placeholder="Balance" readonly></div>
+  `;
+  container.appendChild(newRow);
+  attachListeners(newRow);
+}
+
+function attachListeners(row) {
+  const feeInput = row.querySelector(".fee");
+  const paidInput = row.querySelector(".paid");
+  const balanceInput = row.querySelector(".balance");
+
+  function updateBalance() {
+    const fee = parseFloat(feeInput.value) || 0;
+    const paid = parseFloat(paidInput.value) || 0;
+    balanceInput.value = (fee - paid).toFixed(2);
+  }
+
+  feeInput.addEventListener("input", updateBalance);
+  paidInput.addEventListener("input", updateBalance);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".treatment-row").forEach(attachListeners);
+
+  const hash = window.location.hash;
+  if (hash) {
+    const tabTrigger = document.querySelector(`button[data-bs-target="${hash}"]`);
+    if (tabTrigger) new bootstrap.Tab(tabTrigger).show();
+  }
+});
+</script>
+{% endblock %}
