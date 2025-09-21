@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Prescription</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root { --text:#0f172a; --muted:#6b7280; }
+    * { box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; color: var(--text); margin: 24px; line-height: 1.25; }
+
+    /* Header */
+    .header { display:flex; justify-content:space-between; align-items:flex-start; }
+    .clinic { display:flex; gap:14px; align-items:center; }
+    .clinic img { height:80px; width:auto; }
+    h2 { margin:0 0 4px 0; font-size:26px; font-weight:bold; }
+    .small { color: var(--muted); font-size:14px; }
+
+    /* Patient */
+    .patient { margin:12px 0; padding:8px; border:1px solid #e5e7eb; border-radius:8px; }
+    .patient .row { display:flex; justify-content:space-between; flex-wrap:wrap; margin-top:6px; }
+    .patient .left span, .patient .right span { font-size:12px; color:#111; margin-right:12px; }
+    .patient b { font-weight:600; }
+
+    /* Rx symbol left, large */
+    .rx {
+      font-size: 140px;     /* ~1/5 of A5 height */
+      font-weight: 130;
+      margin: 5px 0 px 0;
+      line-height: 1;
+      text-align: left;
+    }
+
+    /* Table (full width, no indent) */
+    table { width:100%; border-collapse:collapse; margin-top:6px; table-layout:fixed; }
+    th, td { border:1px solid #e5e7eb; padding:8px; vertical-align:top; word-wrap:break-word; }
+    th { background:#f8fafc; text-align:left; }
+
+    .notes { margin-top:10px; padding:8px; border:1px dashed #cbd5e1; border-radius:8px; }
+
+    /* Signature block */
+    .sig-box { margin-top: 18px; width: 300px; margin-left: auto; text-align: left; }
+    .sig-row { display:flex; align-items:flex-end; gap:8px; margin:6px 0; }
+    .sig-label { width:72px; font-size:12px; color:#0f172a; white-space:nowrap; }
+    .sig-line { border-bottom:1px solid #111; height:16px; width:200px; display:inline-block; }
+    .sig-value { font-size:12px; }
+
+    /* Print: A5 */
+    @media print {
+      @page { size: A5 portrait; margin: 8mm; }
+      body { margin:0; font-size:11px; line-height:1.2; }
+      .clinic img { height:65px; }
+      h2 { font-size:22px; }
+      .small { font-size:12px; }
+      .patient { margin:8px 0; padding:6px; }
+      .patient .left span, .patient .right span { font-size:10.5px; }
+
+      .rx {
+        font-size:80px;
+        margin: 5px 0 6px 0;
+        text-align:left;
+      }
+
+      th, td { padding:6px; font-size:11px; }
+      .notes { margin-top:8px; padding:6px; }
+
+      .sig-box { width:280px; margin-top:12px; }
+      .sig-label { font-size:11px; width:68px; }
+      .sig-line { width:180px; height:14px; }
+      .sig-value { font-size:11px; }
+
+      .header, .patient, .sig-box { break-inside: avoid; }
+      table tr { break-inside: avoid; }
+      .noprint { display:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="clinic">
+      {% if rx.clinic.logo_path %}
+        <img src="{{ url_for('static', filename=rx.clinic.logo_path.replace('static/', '')) }}" alt="Logo">
+      {% endif %}
+      <div>
+        <h2>{{ rx.clinic.name }}</h2>
+
+        {% if rx.clinic.branches %}
+          {% for b in rx.clinic.branches %}
+            <div class="small">{{ b.address }} - {{ b.phone }}</div>
+          {% endfor %}
+        {% else %}
+          {% if rx.clinic.address %}
+            <div class="small">{{ rx.clinic.address }}{% if rx.clinic.phone %} - {{ rx.clinic.phone }}{% endif %}</div>
+          {% elif rx.clinic.phone %}
+            <div class="small">{{ rx.clinic.phone }}</div>
+          {% endif %}
+        {% endif %}
+
+        {% if rx.clinic.email %}
+          <div class="small">{{ rx.clinic.email }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="small" style="text-align:right;">
+      {% set dt = rx.created_at %}
+      <div><strong>Date:</strong> {{ (dt.astimezone() if dt.tzinfo else dt).strftime('%b %d, %Y') }}</div>
+      <div><strong>Prescription ID:</strong> {{ rx._id }}</div>
+    </div>
+  </div>
+
+  <!-- Patient Info -->
+  <div class="patient">
+    <div><strong>Patient:</strong> {{ patient.last_name|upper }}, {{ patient.first_name }}</div>
+    <div class="row">
+      <div class="left">
+        <span><b>Address:</b> {{ patient.address or '—' }}</span>
+      </div>
+      <div class="right">
+        <span>
+          <b>Age:</b>
+          <span id="ageValue" data-birthdate="{{ patient.birthdate or '' }}">
+            {{ patient_age if patient_age is defined else '' }}
+          </span>
+        </span>
+        <span><b>Sex:</b> {{ patient.gender or 'N/A' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ℞ -->
+  <div class="rx">℞</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Medicine</th>
+        <th>Dosage</th>
+        <th>Frequency</th>
+        <th>Duration</th>
+        <th>Instructions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for it in rx['items'] %}
+      <tr>
+        <td>{{ it.name }}</td>
+        <td>{{ it.dosage }}</td>
+        <td>{{ it.frequency }}</td>
+        <td>{{ it.duration }}</td>
+        <td>{{ it.instructions }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" class="small" style="text-align:center; color:#6b7280;">No items on this prescription.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if rx.notes %}
+  <div class="notes">
+    <strong>Notes:</strong><br>{{ rx.notes }}
+  </div>
+  {% endif %}
+
+  <!-- Signature -->
+  <div class="sig-box">
+    <div class="sig-row">
+      <div class="sig-label">Dentist.</div>
+      <div class="sig-line"><span class="sig-value">{{ rx.dentist_name or '' }}</span></div>
+    </div>
+    <div class="sig-row">
+      <div class="sig-label">Lic. No.</div>
+      <div class="sig-line"><span class="sig-value">{{ rx.lic_no or '' }}</span></div>
+    </div>
+    <div class="sig-row">
+      <div class="sig-label">PTR No.</div>
+      <div class="sig-line"><span class="sig-value">{{ rx.ptr_no or '' }}</span></div>
+    </div>
+  </div>
+
+  <div class="noprint" style="margin-top:12px; text-align:right;">
+    <button onclick="window.print()">Print</button>
+  </div>
+
+  {% if auto_print %}
+  <script>window.print();</script>
+  {% endif %}
+
+  <script>
+    (function () {
+      var span = document.getElementById('ageValue');
+      if (!span) return;
+
+      var currentText = (span.textContent || '').trim();
+      if (currentText) return;
+
+      var b = span.getAttribute('data-birthdate');
+      if (!b) { span.textContent = 'N/A'; return; }
+      var bd = new Date(b);
+      if (isNaN(bd.getTime())) { span.textContent = 'N/A'; return; }
+
+      var today = new Date();
+      var age = today.getFullYear() - bd.getFullYear();
+      var m = today.getMonth() - bd.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+      span.textContent = age >= 0 ? age : 'N/A';
+    })();
+  </script>
+</body>
+</html>

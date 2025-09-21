@@ -5,7 +5,7 @@
     <i class="bi bi-pencil-square me-2"></i> Edit Patient
   </h3>
 
-  <!-- Toast Container -->
+  <!-- Toasts -->
   <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -24,111 +24,148 @@
     {% endwith %}
   </div>
 
+  {# helpers to prefer form values (after failed submit) then fallback to patient #}
+  {% macro val(name, fallback) -%}
+    {{ (request.form.get(name) if request.form.get(name) is not none else fallback) or '' }}
+  {%- endmacro %}
+
+  <!-- ONE form containing everything -->
   <form method="POST" action="{{ url_for('edit_patient', patient_id=patient._id) }}" class="needs-validation" novalidate>
+    {# If you use CSRF: <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> #}
+
     <div class="row g-3">
+
+      <!-- Branch -->
+      <div class="mb-3">
+        <label for="branch" class="form-label fw-bold">Clinic Branch</label>
+        {% set branches = ["Baguio", "Tarlac"] %}
+        {% set current_branch = (request.form.get('branch') if request.form.get('branch') is not none else patient.branch) or 'Baguio' %}
+        <select id="branch" name="branch" class="form-select" required>
+          {% for b in branches %}
+            <option value="{{ b }}" {{ 'selected' if current_branch == b else '' }}>{{ b }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
       <!-- Name -->
       <div class="col-md-4">
-        <label>Last Name</label>
-        <input type="text" class="form-control" name="last_name" value="{{ patient.last_name }}" required>
+        <label class="form-label">Last Name</label>
+        <input type="text" class="form-control" name="last_name" value="{{ val('last_name', patient.last_name) }}" required>
         <div class="invalid-feedback">Required</div>
       </div>
       <div class="col-md-4">
-        <label>First Name</label>
-        <input type="text" class="form-control" name="first_name" value="{{ patient.first_name }}" required>
+        <label class="form-label">First Name</label>
+        <input type="text" class="form-control" name="first_name" value="{{ val('first_name', patient.first_name) }}" required>
         <div class="invalid-feedback">Required</div>
       </div>
       <div class="col-md-4">
-        <label>Middle Name</label>
-        <input type="text" class="form-control" name="middle_name" value="{{ patient.middle_name }}">
+        <label class="form-label">Middle Name</label>
+        <input type="text" class="form-control" name="middle_name" value="{{ val('middle_name', patient.middle_name) }}">
       </div>
 
       <!-- Info -->
       <div class="col-md-4">
-        <label>Birthdate</label>
-        <input type="date" class="form-control" name="birthdate" value="{{ patient.birthdate }}">
+        <label class="form-label">Birthdate</label>
+        <input type="date" class="form-control" name="birthdate" value="{{ val('birthdate', patient.birthdate) }}">
       </div>
+
       <div class="col-md-4">
-        <label>Gender</label>
+        <label class="form-label">Status</label>
+        <input type="text" class="form-control" name="status" value="{{ val('status', patient.status) }}">
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Gender</label>
+        {% set g = (request.form.get('gender') if request.form.get('gender') is not none else patient.gender) or '' %}
         <select class="form-select" name="gender">
           <option value="">Select Gender</option>
-          <option value="Male" {{ 'selected' if patient.gender == 'Male' else '' }}>Male</option>
-          <option value="Female" {{ 'selected' if patient.gender == 'Female' else '' }}>Female</option>
+          <option value="Male"   {{ 'selected' if g == 'Male' else '' }}>Male</option>
+          <option value="Female" {{ 'selected' if g == 'Female' else '' }}>Female</option>
         </select>
       </div>
+
+      <div class="col-md-8">
+        <label for="referred_by" class="form-label">Referred By</label>
+        <input type="text" id="referred_by" name="referred_by" class="form-control"
+               value="{{ val('referred_by', patient.referred_by) }}"
+               placeholder="e.g., Friend, Facebook, Google, Walk-in, Dentist">
+      </div>
+
       <div class="col-md-4">
-        <label>Contact Number</label>
-        <input type="text" class="form-control" name="contact" value="{{ patient.contact }}">
+        <label class="form-label">Contact Number</label>
+        <input type="text" class="form-control" name="contact" value="{{ val('contact', patient.contact) }}">
       </div>
 
       <!-- Address & Company -->
       <div class="col-12">
-        <label>Address</label>
-        <input type="text" class="form-control" name="address" value="{{ patient.address }}">
+        <label class="form-label">Address</label>
+        <input type="text" class="form-control" name="address" value="{{ val('address', patient.address) }}">
       </div>
       <div class="col-12">
-        <label>Company</label>
-        <input type="text" class="form-control" name="company" value="{{ patient.company }}">
+        <label class="form-label">Company</label>
+        <input type="text" class="form-control" name="company" value="{{ val('company', patient.company) }}">
       </div>
 
       <!-- Identification -->
       <div class="col-md-6">
-        <label>Identification No.</label>
-        <input type="text" class="form-control" name="identification_no" value="{{ patient.identification_no }}">
+        <label class="form-label">Identification No.</label>
+        <input type="text" class="form-control" name="identification_no" value="{{ val('identification_no', patient.identification_no) }}">
       </div>
 
-      <!-- Allergy Checkbox -->
+      <!-- Allergies -->
+      {% set has_allergy_form = request.form.get('has_allergy') %}
+      {% set has_allergy = (has_allergy_form == 'on') if has_allergy_form is not none else (patient.has_allergy or false) %}
+      {% set allergies_csv = (request.form.get('allergies') if request.form.get('allergies') is not none
+                              else (patient.allergies if patient.allergies is string
+                                    else (patient.allergies|join(', ') if patient.allergies else ''))) %}
+
       <div class="col-12">
         <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="hasAllergy" name="has_allergy" {% if patient.has_allergy %}checked{% endif %}>
+          <input type="checkbox" class="form-check-input" id="hasAllergy" name="has_allergy" {{ 'checked' if has_allergy else '' }}>
           <label class="form-check-label" for="hasAllergy">Does this patient have allergies?</label>
         </div>
       </div>
 
-      <!-- Allergy Text -->
-      <div class="col-12" id="allergyInput" style="display: {% if patient.has_allergy %}block{% else %}none{% endif %};">
-        <label>List of Allergies</label>
-        <input type="text" class="form-control" name="allergies" value="{% if patient.allergies is string %}{{ patient.allergies }}{% elif patient.allergies %}{{ patient.allergies | join(', ') }}{% endif %}">
+      <div class="col-12 {{ '' if has_allergy else 'd-none' }}" id="allergyInput">
+        <label class="form-label">List of Allergies</label>
+        <input type="text" class="form-control" name="allergies" value="{{ allergies_csv }}">
         <small class="text-muted">Separate multiple allergies with commas.</small>
       </div>
 
-      <!-- Notes -->
-      <div class="col-12">
-        <label>Notes</label>
-        <textarea class="form-control" name="notes" rows="3">{{ patient.notes }}</textarea>
-      </div>
-    </div>
-
-    <!-- Emergency Contact -->
-    <div class="mt-4">
-      <h5 class="text-purple fw-bold">In Case of Emergency</h5>
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label>Contact Person Name</label>
-          <input type="text" class="form-control" name="emergency_contact_name" value="{{ patient.emergency_contact_name }}">
-        </div>
-        <div class="col-md-6">
-          <label>Contact Number</label>
-          <input type="text" class="form-control" name="emergency_contact_number" value="{{ patient.emergency_contact_number }}">
+      <!-- Emergency Contact -->
+      <div class="mt-4">
+        <h5 class="text-purple fw-bold">In Case of Emergency</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Contact Person Name</label>
+            <input type="text" class="form-control" name="emergency_contact_name" value="{{ val('emergency_contact_name', patient.emergency_contact_name) }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Contact Number</label>
+            <input type="text" class="form-control" name="emergency_contact_number" value="{{ val('emergency_contact_number', patient.emergency_contact_number) }}">
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Actions -->
-    <div class="mt-4 d-flex gap-2">
-      <button type="submit" class="btn btn-primary">Save</button>
-      <a href="{{ url_for('list_patients') }}" class="btn btn-secondary">Cancel</a>
+      <!-- Actions -->
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{{ url_for('list_patients') }}" class="btn btn-secondary">Cancel</a>
+      </div>
     </div>
   </form>
 </div>
 
 <!-- Scripts -->
 <script>
+  // Show/hide allergy field
   const hasAllergy = document.getElementById("hasAllergy");
   const allergyInput = document.getElementById("allergyInput");
-
-  hasAllergy.addEventListener("change", () => {
-    allergyInput.style.display = hasAllergy.checked ? "block" : "none";
-  });
+  if (hasAllergy && allergyInput) {
+    hasAllergy.addEventListener("change", () => {
+      allergyInput.classList.toggle("d-none", !hasAllergy.checked);
+    });
+  }
 
   // Bootstrap validation
   (() => {

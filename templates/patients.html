@@ -12,30 +12,62 @@
 <!-- Container -->
 <div class="container py-4">
 
-  <!-- Filters -->
-  <div class="row g-3 mb-3">
+  <!-- Filters (server-side) -->
+  <form class="row g-3 mb-3 align-items-end" method="get" action="{{ url_for('list_patients') }}">
+    <!-- Company -->
     <div class="col-md-4">
-      <select id="companyFilter" class="form-select">
-        <option value="">Filter by Company (All)</option>
-        {% for company in patients | selectattr('company', 'defined') | map(attribute='company') | reject('equalto', '') | unique | sort %}
-          <option value="{{ company }}">{{ company }}</option>
+      <label for="companyFilter" class="form-label mb-1">Company</label>
+      <select id="companyFilter" name="company" class="form-select">
+        <option value="" {{ ''==company and 'selected' or '' }}>Filter by Company (All)</option>
+        {% for c in companies %}
+          <option value="{{ c }}" {{ 'selected' if c==company else '' }}>{{ c }}</option>
         {% endfor %}
       </select>
     </div>
-    <div class="col-md-8">
+
+    <!-- Branch -->
+    <div class="col-md-3">
+      <label for="branchFilter" class="form-label mb-1">Branch</label>
+      <select id="branchFilter" name="branch" class="form-select">
+        <option value="" {{ ''==branch and 'selected' or '' }}>Filter by Branch (All)</option>
+        <option value="Baguio" {{ 'selected' if branch=='Baguio' else '' }}>Baguio</option>
+        <option value="Tarlac"  {{ 'selected' if branch=='Tarlac'  else '' }}>Tarlac</option>
+      </select>
+    </div>
+
+    <!-- Search -->
+    <div class="col-md-4">
+      <label for="searchInput" class="form-label mb-1">Search</label>
       <div class="input-group">
         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-        <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Search patients by name...">
+        <input type="text" class="form-control border-start-0" id="searchInput" name="q"
+               value="{{ q or '' }}" placeholder="Search patients by name...">
       </div>
     </div>
-  </div>
 
-  <!-- Patient Count -->
-  <p class="text-primary fw-bold text-center mb-4">{{ patients|length }} patient record(s)</p>
+    <!-- Per page -->
+    <div class="col-md-1">
+      <label class="form-label mb-1">Per</label>
+      <select class="form-select" name="per_page">
+        {% for n in [10,25,50,100] %}
+          <option value="{{ n }}" {{ 'selected' if per_page==n else '' }}>{{ n }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Always reset to page 1 on filter/search change -->
+    <input type="hidden" name="page" value="1">
+  </form>
+
+  <!-- Server-side count -->
+  <p class="text-primary fw-bold text-center mb-2">
+    Page {{ page }} • Showing {{ (page-1)*per_page + 1 }}–{{ [page*per_page, total]|min }}
+    of {{ total }} patient{{ '' if total==1 else 's' }}
+  </p>
 
   <!-- Patient Cards -->
   {% for patient in patients %}
-  <div class="card mb-3 shadow-sm border-0 patient-card" data-company="{{ patient.company | default('') }}">
+  <div class="card mb-3 shadow-sm border-0 patient-card">
     <div class="card-body d-flex align-items-center justify-content-between">
 
       <!-- Left: Avatar & Info -->
@@ -44,12 +76,23 @@
              alt="Avatar" class="avatar rounded-circle me-3">
 
         <div class="flex-grow-1">
-          <h6 class="mb-1">
+          <h6 class="mb-1 d-flex align-items-center gap-2">
             <a href="{{ url_for('view_patient', patient_id=patient._id) }}"
                class="text-decoration-none fw-semibold text-primary">
               {{ patient.last_name }}, {{ patient.first_name }}
             </a>
+
+            {% set branch_badge = patient.branch or '' %}
+            {% if branch_badge %}
+              <span class="badge rounded-pill
+                {% if branch_badge == 'Baguio' %} bg-primary
+                {% elif branch_badge == 'Tarlac' %} bg-success
+                {% else %} bg-secondary {% endif %}">
+                {{ branch_badge }}
+              </span>
+            {% endif %}
           </h6>
+
           <p class="mb-1 text-muted small">{{ patient.contact or 'No contact info' }}</p>
 
           {% if patient.company %}
@@ -66,34 +109,33 @@
             </small>
           {% endif %}
 
+          {# --- Allergy pills: show only if has_allergy --- #}
+          {% set items = patient.allergies if patient.allergies is iterable else ([patient.allergies] if patient.allergies else []) %}
+          {% set max_badges = 5 %}
+
           {% if patient.has_allergy %}
             <div class="mt-2">
-              {% if patient.allergies %}
-                {% if patient.allergies is string %}
-                  <span class="badge bg-danger me-1">
-                    <i class="bi bi-exclamation-circle-fill me-1"></i> {{ patient.allergies }}
-                  </span>
-                {% else %}
-                  {% set valid_allergies = patient.allergies | select('string') | select('trim') | list %}
-                  {% if valid_allergies %}
-                    {% for allergy in valid_allergies %}
-                      <span class="badge bg-danger me-1">
-                        <i class="bi bi-exclamation-circle-fill me-1"></i> {{ allergy }}
-                      </span>
-                    {% endfor %}
-                  {% else %}
-                    <span class="badge bg-danger me-1">
-                      <i class="bi bi-exclamation-circle-fill me-1"></i> ⚠️ Allergy info missing
+              {% if items|length > 0 %}
+                <div class="d-flex flex-wrap align-items-center gap-1">
+                  {% for a in items[:max_badges] %}
+                    <span class="badge rounded-pill text-bg-danger">{{ a }}</span>
+                  {% endfor %}
+                  {% if items|length > max_badges %}
+                    <span class="badge rounded-pill text-bg-danger-subtle border"
+                          data-bs-toggle="tooltip"
+                          title="{{ items|join(', ') }}">
+                      +{{ items|length - max_badges }} more
                     </span>
                   {% endif %}
-                {% endif %}
+                </div>
               {% else %}
-                <span class="badge bg-danger me-1">
-                  <i class="bi bi-exclamation-circle-fill me-1"></i> ⚠️ Allergy info missing
+                <span class="badge text-bg-warning">
+                  <i class="bi bi-exclamation-triangle me-1"></i> Allergy info missing
                 </span>
               {% endif %}
             </div>
           {% endif %}
+          {# --- end allergy pills --- #}
         </div>
       </div>
 
@@ -112,33 +154,41 @@
     </div>
   </div>
   {% endfor %}
-</div>
 
-<!-- Scripts -->
+  <!-- Pagination -->
+  <nav class="d-flex justify-content-between align-items-center mt-3">
+    <div class="text-muted small">
+      Page {{ page }} • Showing {{ (page-1)*per_page + 1 }}–{{ [page*per_page, total]|min }} of {{ total }}
+    </div>
+    <div class="btn-group">
+      <a class="btn btn-outline-secondary btn-sm {{ 'disabled' if page<=1 }}"
+         href="{{ url_for('list_patients', page=page-1, per_page=per_page, q=q, branch=branch, company=company) }}">‹ Prev</a>
+      <a class="btn btn-outline-secondary btn-sm {{ 'disabled' if page*per_page>=total }}"
+         href="{{ url_for('list_patients', page=page+1, per_page=per_page, q=q, branch=branch, company=company) }}">Next ›</a>
+    </div>
+  </nav>
+
+</div> <!-- /container -->
+
+<!-- Scripts (auto-submit filters + debounce search; tooltips) -->
 <script>
-  // Filter by name and company
-  const searchInput = document.getElementById("searchInput");
-  const companyFilter = document.getElementById("companyFilter");
+  // submit on select change
+  document.querySelectorAll('select[name=company],select[name=branch],select[name=per_page]')
+    .forEach(el => el.addEventListener('change', () => el.form.submit()));
 
-  function filterPatients() {
-    const nameValue = searchInput.value.toLowerCase();
-    const companyValue = companyFilter.value.toLowerCase();
-
-    document.querySelectorAll(".patient-card").forEach(card => {
-      const name = card.querySelector("h6").textContent.toLowerCase();
-      const company = card.getAttribute("data-company").toLowerCase();
-      const nameMatch = name.includes(nameValue);
-      const companyMatch = !companyValue || company === companyValue;
-      card.style.display = (nameMatch && companyMatch) ? "" : "none";
+  // debounce search
+  const q = document.querySelector('input[name="q"]');
+  if (q) {
+    let t; q.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(() => q.form.submit(), 300);
     });
   }
 
-  searchInput.addEventListener("keyup", filterPatients);
-  companyFilter.addEventListener("change", filterPatients);
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltips.forEach(el => new bootstrap.Tooltip(el));
+  // tooltips (for +N more and action buttons)
+  document.addEventListener('DOMContentLoaded', () => {
+    const tips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tips.forEach(el => new bootstrap.Tooltip(el));
   });
 </script>
 

@@ -1,0 +1,852 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1400 900"
+   version="1.1"
+   id="svg43"
+   sodipodi:docname="tooth_labeled.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview43"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.5"
+     inkscape:cx="1244"
+     inkscape:cy="491"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg43" />
+  <title
+     id="title1">Tooth Chart – Clean Grid (IDs + data-tooth hooks)</title>
+  <defs
+     id="defs7">
+    <linearGradient
+       id="linearGradient31"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#131127;stop-opacity:1;"
+         offset="0"
+         id="stop31" />
+      <stop
+         style="stop-color:#131127;stop-opacity:0;"
+         offset="1"
+         id="stop32" />
+    </linearGradient>
+    <style
+       id="style1">
+      .tooth { fill: #ffffff; stroke: #1f2937; stroke-width: 2; }
+      .tooth:hover { fill: #f3f4f6; cursor: pointer; }
+      .label { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; font-size: 18px; fill: #111827; }
+      .jaw-title { font-weight: 700; font-size: 22px; fill: #111827; }
+      .midline { stroke: #e5e7eb; stroke-width: 3; stroke-dasharray: 4 8; }
+      .arc-number { font-size: 16px; fill: #6b7280; }
+      .selected { stroke: #2563eb; stroke-width: 3; }
+      .grid { stroke: #f3f4f6; stroke-width: 1; }
+      .shadow { filter: drop-shadow(0 1px 1px rgba(0,0,0,.08)); }
+    </style>
+    <!-- Simplified tooth shapes -->
+    <!-- Incisor -->
+    <symbol
+       id="shape-incisor"
+       viewBox="0 0 100 120">
+      <path
+         d="M20,15 C35,5 65,5 80,15 C90,25 95,45 90,65 C85,85 70,100 50,110 C30,100 15,85 10,65 C5,45 10,25 20,15 Z"
+         id="path1" />
+    </symbol>
+    <!-- Canine -->
+    <symbol
+       id="shape-canine"
+       viewBox="0 0 100 120">
+      <path
+         d="M25,15 C40,5 60,5 75,15 C85,25 90,45 85,65 C80,85 65,100 50,110 C35,100 20,85 15,65 C10,45 15,25 25,15 Z"
+         id="path2" />
+      <path
+         d="M48,110 L52,110 L55,120 L45,120 Z"
+         id="path3" />
+    </symbol>
+    <!-- Premolar -->
+    <symbol
+       id="shape-premolar"
+       viewBox="0 0 110 120">
+      <path
+         d="M15,25 C25,10 85,10 95,25 C105,40 105,85 95,95 C85,105 25,105 15,95 C5,85 5,40 15,25 Z"
+         id="path4" />
+      <path
+         d="M35,55 q20,-10 40,0 M30,75 q25,-8 50,0"
+         fill="none"
+         stroke="#9ca3af"
+         stroke-width="2"
+         id="path5" />
+    </symbol>
+    <!-- Molar -->
+    <symbol
+       id="shape-molar"
+       viewBox="0 0 120 120">
+      <path
+         d="M12,28 C24,10 96,10 108,28 C118,42 118,90 108,102 C96,114 24,114 12,102 C2,90 2,42 12,28 Z"
+         id="path6" />
+      <path
+         d="M35,50 q25,-12 50,0 M30,70 q30,-10 60,0 M40,90 q20,-8 40,0"
+         fill="none"
+         stroke="#9ca3af"
+         stroke-width="2"
+         id="path7" />
+    </symbol>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient31"
+       id="linearGradient32"
+       x1="493.11389"
+       y1="587.40094"
+       x2="899.10413"
+       y2="587.40094"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <!-- background grid -->
+  <g
+     opacity="0.6"
+     id="g9">
+    <path
+       class="grid"
+       d="M0,450 L1400,450"
+       id="path9" />
+  </g>
+  <!-- Midline -->
+  <!-- Titles -->
+  <text
+     x="698.90912"
+     y="140.36363"
+     text-anchor="middle"
+     class="jaw-title"
+     id="text9">Maxillary (Upper) Teeth 1–16</text>
+  <text
+     x="695.63635"
+     y="593.54547"
+     text-anchor="middle"
+     class="jaw-title"
+     id="text10"
+     style="fill:url(#linearGradient32)"><tspan
+       style="fill:#3c2d7e;fill-opacity:1"
+       id="tspan31">Mandibular (Lower) Teeth 17–32</tspan></text>
+  <!-- Number arcs: top (1–16) -->
+  <g
+     id="arc-top">
+    <path
+       id="path-top"
+       d="M150,140 C700,-40 700,-40 1250,140"
+       fill="none"
+       stroke="none" />
+    <!-- place numbers along path -->
+    <text
+       class="arc-number"
+       id="text11"><textPath
+         href="#path-top"
+         startOffset="0%"
+         id="textPath10"><tspan
+           id="tspan10" /></textPath></text>
+    <!-- We'll position discrete numbers manually for control -->
+  </g>
+  <!-- TOP ROW (1–16) -->
+  <!-- We'll lay out 16 slots across width -->
+  <g
+     id="top-row"
+     transform="translate(98,193)">
+    <!-- spacing calc: (1400-160)/16 ≈ 77.5; we'll use 78 -->
+    <!-- Map: 1..16 left->right -->
+    <!-- function to place: x = i*78; y = 0 -->
+    <!-- Use different shapes per FDI-ish positions: 
+         1,2,15,16: molars; 3,4,13,14: premolars; 5,12: canine; 6-11: incisors -->
+    <!-- We'll define a helper through repetition -->
+    <!-- Teeth 1..16 -->
+    <!-- Python would generate this normally; here we expand -->
+    <!-- indices and shapes -->
+    <!-- positions -->
+    <!-- i from 0..15 -->
+    <!-- We'll manually write entries for precision -->
+    <!-- Tooth 1 (molar) -->
+    <g
+       id="tooth-1"
+       data-tooth="1"
+       class="shadow">
+      <use
+         href="#shape-molar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use11" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text12">1</text>
+    </g>
+    <!-- Tooth 2 (molar) -->
+    <g
+       id="tooth-2"
+       data-tooth="2"
+       transform="translate(78)"
+       class="shadow">
+      <use
+         href="#shape-molar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use12" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text13">2</text>
+    </g>
+    <!-- Tooth 3 (premolar) -->
+    <g
+       id="tooth-3"
+       data-tooth="3"
+       transform="translate(156,10)"
+       class="shadow">
+      <use
+         href="#shape-premolar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use13" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text14">3</text>
+    </g>
+    <!-- Tooth 4 (premolar) -->
+    <g
+       id="tooth-4"
+       data-tooth="4"
+       transform="translate(234,10)"
+       class="shadow">
+      <use
+         href="#shape-premolar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use14" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text15">4</text>
+    </g>
+    <!-- Tooth 5 (canine) -->
+    <g
+       id="tooth-5"
+       data-tooth="5"
+       transform="translate(312,20)"
+       class="shadow">
+      <use
+         href="#shape-canine"
+         width="56"
+         height="56"
+         x="2"
+         y="0"
+         class="tooth"
+         id="use15" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text16">5</text>
+    </g>
+    <!-- Tooth 6 (incisor) -->
+    <g
+       id="tooth-6"
+       data-tooth="6"
+       transform="translate(390,22)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use16" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text17">6</text>
+    </g>
+    <!-- Tooth 7 (incisor) -->
+    <g
+       id="tooth-7"
+       data-tooth="7"
+       transform="translate(468,24)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use17" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text18">7</text>
+    </g>
+    <!-- Tooth 8 (incisor) -->
+    <g
+       id="tooth-8"
+       data-tooth="8"
+       transform="translate(546,26)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use18" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text19">8</text>
+    </g>
+    <!-- Tooth 9 (incisor) -->
+    <g
+       id="tooth-9"
+       data-tooth="9"
+       transform="translate(624,26)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use19" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text20">9</text>
+    </g>
+    <!-- Tooth 10 (incisor) -->
+    <g
+       id="tooth-10"
+       data-tooth="10"
+       transform="translate(702,24)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use20" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text21">10</text>
+    </g>
+    <!-- Tooth 11 (incisor) -->
+    <g
+       id="tooth-11"
+       data-tooth="11"
+       transform="translate(780,22)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use21" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text22">11</text>
+    </g>
+    <!-- Tooth 12 (canine) -->
+    <g
+       id="tooth-12"
+       data-tooth="12"
+       transform="translate(858,20)"
+       class="shadow">
+      <use
+         href="#shape-canine"
+         width="56"
+         height="56"
+         x="2"
+         y="0"
+         class="tooth"
+         id="use22" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text23">12</text>
+    </g>
+    <!-- Tooth 13 (premolar) -->
+    <g
+       id="tooth-13"
+       data-tooth="13"
+       transform="translate(936,10)"
+       class="shadow">
+      <use
+         href="#shape-premolar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use23" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text24">13</text>
+    </g>
+    <!-- Tooth 14 (premolar) -->
+    <g
+       id="tooth-14"
+       data-tooth="14"
+       transform="translate(1014,10)"
+       class="shadow">
+      <use
+         href="#shape-premolar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use24" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text25">14</text>
+    </g>
+    <!-- Tooth 15 (molar) -->
+    <g
+       id="tooth-15"
+       data-tooth="15"
+       transform="translate(1092)"
+       class="shadow">
+      <use
+         href="#shape-molar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use25" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text26">15</text>
+    </g>
+    <!-- Tooth 16 (molar) -->
+    <g
+       id="tooth-16"
+       data-tooth="16"
+       transform="translate(1170)"
+       class="shadow">
+      <use
+         href="#shape-molar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use26" />
+      <text
+         x="30"
+         y="-12"
+         text-anchor="middle"
+         class="label"
+         id="text27">16</text>
+    </g>
+  </g>
+  <!-- BOTTOM ROW (17–32) -->
+  <g
+     id="bottom-row"
+     transform="translate(82.181818,438.90909)">
+    <!-- Mirror layout -->
+    <!-- 17 (molar) .. 32 (molar) -->
+    <g
+       id="tooth-32"
+       data-tooth="32"
+       class="shadow">
+      <use
+         href="#shape-molar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use27" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text28">32</text>
+    </g>
+    <g
+       id="tooth-31"
+       data-tooth="31"
+       transform="translate(78)"
+       class="shadow">
+      <use
+         href="#shape-molar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use28" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text29"><tspan
+           sodipodi:role="line"
+           id="tspan4"
+           x="30"
+           y="84">31</tspan></text>
+    </g>
+    <g
+       id="tooth-30"
+       data-tooth="30"
+       transform="translate(156,-10)"
+       class="shadow">
+      <use
+         href="#shape-premolar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use29" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text30">30</text>
+    </g>
+    <g
+       id="tooth-29"
+       data-tooth="29"
+       transform="translate(234,-10)"
+       class="shadow">
+      <use
+         href="#shape-premolar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use30" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text31">29</text>
+    </g>
+    <g
+       id="tooth-28"
+       data-tooth="28"
+       transform="translate(312,-20)"
+       class="shadow">
+      <use
+         href="#shape-canine"
+         width="56"
+         height="56"
+         x="2"
+         y="0"
+         class="tooth"
+         id="use31" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text32">28</text>
+    </g>
+    <g
+       id="tooth-27"
+       data-tooth="27"
+       transform="translate(390,-22)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use32" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text33">27</text>
+    </g>
+    <g
+       id="tooth-26"
+       data-tooth="26"
+       transform="translate(468,-24)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use33" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text34">26</text>
+    </g>
+    <g
+       id="tooth-25"
+       data-tooth="25"
+       transform="translate(546,-26)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use34" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text35">25</text>
+    </g>
+    <g
+       id="tooth-24"
+       data-tooth="24"
+       transform="translate(624,-26)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use35" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text36">24</text>
+    </g>
+    <g
+       id="tooth-23"
+       data-tooth="23"
+       transform="translate(702,-24)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use36" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text37">23</text>
+    </g>
+    <g
+       id="tooth-22"
+       data-tooth="22"
+       transform="translate(780,-22)"
+       class="shadow">
+      <use
+         href="#shape-incisor"
+         width="54"
+         height="54"
+         x="3"
+         y="0"
+         class="tooth"
+         id="use37" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text38">22</text>
+    </g>
+    <g
+       id="tooth-21"
+       data-tooth="21"
+       transform="translate(858,-20)"
+       class="shadow">
+      <use
+         href="#shape-canine"
+         width="56"
+         height="56"
+         x="2"
+         y="0"
+         class="tooth"
+         id="use38" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text39">21</text>
+    </g>
+    <g
+       id="tooth-20"
+       data-tooth="20"
+       transform="translate(936,-10)"
+       class="shadow">
+      <use
+         href="#shape-premolar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use39" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text40">20</text>
+    </g>
+    <g
+       id="tooth-19"
+       data-tooth="19"
+       transform="translate(1014,-10)"
+       class="shadow">
+      <use
+         href="#shape-premolar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use40" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text41">19</text>
+    </g>
+    <g
+       id="tooth-18"
+       data-tooth="18"
+       transform="translate(1092)"
+       class="shadow">
+      <use
+         href="#shape-molar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use41" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text42"><tspan
+           sodipodi:role="line"
+           id="tspan1"
+           x="30"
+           y="84">18</tspan><tspan
+           sodipodi:role="line"
+           id="tspan2"
+           x="30"
+           y="106.5" /></text>
+    </g>
+    <g
+       id="tooth-17"
+       data-tooth="17"
+       transform="translate(1170)"
+       class="shadow">
+      <use
+         href="#shape-molar"
+         width="60"
+         height="60"
+         x="0"
+         y="0"
+         class="tooth"
+         id="use42" />
+      <text
+         x="30"
+         y="84"
+         text-anchor="middle"
+         class="label"
+         id="text43">17</text>
+    </g>
+  </g>
+</svg>

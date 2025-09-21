@@ -2,15 +2,16 @@
 {% block content %}
 <div class="container mt-4">
 
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="fw-bold text-primary">
-      <i class="bi bi-person-circle me-2"></i> {{ patient.first_name }} {{ patient.last_name }}
-    </h3>
-    <a href="{{ url_for('edit_patient', patient_id=patient._id) }}" class="btn btn-outline-primary btn-sm">
-      <i class="bi bi-pencil"></i> Edit
-    </a>
-  </div>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="fw-bold text-primary d-flex align-items-center gap-2 mb-0">
+    <i class="bi bi-person-circle me-2"></i>
+    {{ patient.first_name }} {{ patient.last_name }}
+  </h3>
+  <a href="{{ url_for('edit_patient', patient_id=patient._id) }}" class="btn btn-outline-primary btn-sm">
+    <i class="bi bi-pencil"></i> Edit
+  </a>
+</div>
 
   <!-- Tabs -->
   <ul class="nav nav-tabs mb-3" id="patientTabs" role="tablist">
@@ -29,222 +30,643 @@
   </ul>
 
   <div class="tab-content" id="patientTabsContent">
-    <!-- Personal Info Tab -->
-    <div class="tab-pane fade show active" id="info" role="tabpanel">
-      <div class="row g-4 mt-2">
-        <div class="col-md-6">
-          <div class="card shadow-sm p-3">
-            <h6 class="fw-bold text-primary mb-2">Patient Details</h6>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item"><strong>Gender:</strong> {{ patient.gender or 'N/A' }}</li>
-              <li class="list-group-item"><strong>Birthdate:</strong> {{ patient.birthdate or 'N/A' }}</li>
-              <li class="list-group-item"><strong>Contact:</strong> {{ patient.contact or 'N/A' }}</li>
-              <li class="list-group-item"><strong>Address:</strong> {{ patient.address or 'N/A' }}</li>
-              <li class="list-group-item"><strong>Company:</strong> {{ patient.company or 'N/A' }}</li>
-              <li class="list-group-item"><strong>ID No.:</strong> {{ patient.identification_no or 'N/A' }}</li>
-              <li class="list-group-item"><strong>Allergies:</strong>
-                {% if patient.has_allergy and patient.allergies %}
-                  {% if patient.allergies is string %}
-                    <span class="badge bg-danger">{{ patient.allergies }}</span>
-                  {% else %}
-                    {% for allergy in patient.allergies %}
-                      <span class="badge bg-danger me-1">{{ allergy }}</span>
-                    {% endfor %}
-                  {% endif %}
-                {% else %}
-                  <span class="badge bg-success">None</span>
-                {% endif %}
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Popup Selector -->
+<div id="condition-popup" class="card p-3 shadow" style="position: fixed; bottom: 20px; right: 20px; display: none; z-index: 1000;">
+  <h6 class="fw-bold mb-2" id="popup-title">Tooth</h6>
+  <select id="condition-select" class="form-select">
+    <option value="">-- Select Condition --</option>
+    <option value="C">C - Caries</option>
+    <option value="M">M - Missing</option>
+    <option value="F">F - Filled</option>
+    <option value="Un">Un - Unerrupted</option>
+    <option value="PD">PD - Partial Denture</option>
+    <option value="Fc">Fc - Filled with Caries</option>
+    <option value="Ab">Ab - Abutment</option>
+    <option value="P">P - Pontic/Bridge</option>
+    <option value="PJC">PJC - Plastic Jacket Crown</option>
+    <option value="CLA">CLA - Clasp</option>
+    <option value="RRF">RRF - Retained Root Fragment</option>
+  </select>
+  <button id="save-condition" class="btn btn-primary btn-sm mt-2">Save</button>
+</div>
 
-    <!-- Tooth Chart Tab -->
-    <div class="tab-pane fade" id="tooth" role="tabpanel">
-      <div class="card p-3">
-        <h5 class="fw-bold mb-3 text-primary">Interactive Tooth Chart</h5>
-        <div class="tooth-container position-relative text-center">
-          <img src="{{ url_for('static', filename='images/tooth.png') }}" alt="Tooth Chart" class="img-fluid" style="max-height: 500px;">
-         {% for i in range(1, 17) %}
-        <div class="tooth-overlay" data-tooth="{{ i }}" style="top: 50px; left: {{ 60 + (i-1)*40 }}px;"></div>
-        <div class="tooth-label" style="top: 40px; left: {{ 60 + (i-1)*40 + 10 }}px;">{{ i }}</div>
-    {% endfor %}
+<!-- Personal Info Tab -->
+<div class="tab-pane fade show active" id="info" role="tabpanel">
 
-  {% for i in range(17, 33) %}
-  <div class="tooth-overlay" data-tooth="{{ i }}" style="top: 370px; left: {{ 60 + (i-17)*40 }}px;"></div>
-  <div class="tooth-label" style="top: 420px; left: {{ 60 + (i-17)*40 + 10 }}px;">{{ i }}</div>
-  {% endfor %}
-
-        </div>
-      </div>
-    </div>
-
-    <!-- Treatment Tab -->
-    <div class="tab-pane fade" id="treatment" role="tabpanel">
-      <div class="card mt-4">
-        <div class="card-header bg-light"><strong>Treatment Records</strong></div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-bordered table-sm text-center align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Date</th>
-                  <th>Diagnosis</th>
-                  <th>Treatment</th>
-                  <th>Fee</th>
-                  <th>Paid</th>
-                  <th>Balance</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-  {% for t in treatments %}
-  <tr>
-    <form method="POST" action="{{ url_for('update_treatment_inline', treatment_id=t._id) }}">
-      <td>{{ t.date }}</td>
-      <td><input type="text" name="diagnosis" class="form-control form-control-sm" value="{{ t.diagnosis }}"></td>
-      <td><input type="text" name="treatment" class="form-control form-control-sm" value="{{ t.treatment }}"></td>
-      <td><input type="number" step="0.01" name="fee" class="form-control form-control-sm text-end" value="{{ t.fee }}"></td>
-      <td><input type="number" step="0.01" name="paid" class="form-control form-control-sm text-end" value="{{ t.paid }}"></td>
-      <td class="text-end">
-        <strong class="{% if (t.fee - t.paid) > 0 %}text-danger{% else %}text-success{% endif %}">
-          ₱{{ "{:,.2f}".format(t.fee - t.paid) }}
-        </strong>
-      </td>
-      <td>
-        <button type="submit" class="btn btn-sm btn-outline-primary me-1">
-          <i class="bi bi-save"></i>
-        </button>
-        <form method="POST" action="{{ url_for('remove_treatment', treatment_id=t._id, patient_id=patient._id) }}" class="d-inline">
-          <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this record?')">
-            <i class="bi bi-trash"></i>
-          </button>
-        </form>
-      </td>
-    </form>
-  </tr>
-  {% else %}
-  <tr><td colspan="7" class="text-center py-3">No treatment records found.</td></tr>
-  {% endfor %}
-</tbody>
-
-
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mt-4">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-          <strong>Add Treatment Record</strong>
-          <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTreatmentRow()">➕ Add Row</button>
-        </div>
-        <div class="card-body">
-          <form method="POST" action="{{ url_for('add_treatment', patient_id=patient._id) }}#treatment">
-            <div id="treatmentRows">
-              <div class="row g-2 treatment-row mb-3">
-                <div class="col-md-2"><input type="date" name="date[]" class="form-control" required></div>
-                <div class="col-md-2"><input type="text" name="diagnosis[]" class="form-control" placeholder="Diagnosis" required></div>
-                <div class="col-md-2"><input type="text" name="treatment[]" class="form-control" placeholder="Treatment" required></div>
-                <div class="col-md-2"><input type="number" name="fee[]" class="form-control fee" placeholder="Fee" required></div>
-                <div class="col-md-2"><input type="number" name="paid[]" class="form-control paid" placeholder="Paid" required></div>
-                <div class="col-md-2"><input type="number" name="balance[]" class="form-control balance" placeholder="Balance" readonly></div>
-              </div>
+  <div class="row g-4 mt-2">
+    <!-- LEFT COLUMN -->
+    <div class="col-12 col-md-6 col-lg-7">
+      <div class="card card-elev h-100">
+        <!-- Profile header -->
+        <div class="profile-header">
+          <div class="d-flex align-items-center gap-3">
+            <div class="avatar-xl">
+              {{ (patient.first_name[:1] ~ patient.last_name[:1]) if patient.first_name and patient.last_name else 'P' }}
             </div>
-            <div class="d-flex justify-content-end gap-2 mt-3">
-              <button type="submit" class="btn btn-success">
-                <i class="bi bi-plus-circle"></i> Save All
-              </button>
-              <a href="{{ url_for('list_patients') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left-circle"></i> Back to List
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <h5 class="mb-0">
+                  {{ patient.first_name }} {{ patient.last_name }}
+                </h5>
+                {% if patient.branch %}
+                  <span class="branch-pill">{{ patient.branch }}</span>
+                {% endif %}
+                {% if patient_age %}
+                  <span class="text-muted small">{{ patient_age }} yrs</span>
+                {% endif %}
+              </div>
+              {% if patient.referred_by %}
+                <div class="text-muted small mt-1">
+                  Referred by: {{ patient.referred_by }}
+                </div>
+              {% endif %}
+            </div>
+            <div class="d-none d-md-block">
+              <a href="{{ url_for('edit_patient', patient_id=patient._id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil-square me-1"></i>Edit
               </a>
             </div>
-          </form>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="quick-actions mt-3 d-flex flex-wrap gap-2">
+            {% if patient.contact %}
+              {% set phone = (patient.contact | replace(' ', '') | replace('-', '') | replace('(', '') | replace(')', '')) %}
+              <a class="btn btn-sm btn-outline-secondary" href="tel:{{ phone }}"><i class="bi bi-telephone me-1"></i>Call</a>
+              <a class="btn btn-sm btn-outline-secondary" href="sms:{{ phone }}"><i class="bi bi-chat-dots me-1"></i>Text</a>
+              <a class="btn btn-sm btn-outline-secondary" target="_blank"
+                 href="https://wa.me/{{ phone | replace('+','') }}"><i class="bi bi-whatsapp me-1"></i>WhatsApp</a>
+            {% endif %}
+           <a class="btn btn-sm btn-primary"
+   href="{{ url_for('add_appointment', patient_name=patient.first_name ~ ' ' ~ patient.last_name) }}">
+  <i class="bi bi-calendar-plus me-1"></i>Schedule
+</a>
+
+          </div>
+        </div>
+
+        <!-- Details body -->
+        <div class="p-3 left-card">
+          <h6 class="fw-bold text-primary mb-2">Patient Details</h6>
+
+          <div class="detail-row"><strong>Gender:</strong> {{ patient.gender or 'N/A' }}</div>
+          <div class="detail-row">
+            <strong>Birthdate:</strong>
+            {{ patient.birthdate or 'N/A' }}
+            {% if patient_age %}<span class="text-muted ms-2">({{ patient_age }} yrs)</span>{% endif %}
+          </div>
+          <div class="detail-row"><strong>Contact:</strong> {{ patient.contact or 'N/A' }}</div>
+          <div class="detail-row"><strong>Address:</strong> {{ patient.address or 'N/A' }}</div>
+          <div class="detail-row"><strong>Company:</strong> {{ patient.company or 'N/A' }}</div>
+          <div class="detail-row"><strong>ID No.:</strong> {{ (patient.identification_no or patient.identification) or 'N/A' }}</div>
+
+          {# ---------- Allergies: show ONLY if has_allergy ---------- #}
+          {% set items = patient.allergies if patient.allergies is iterable else ([patient.allergies] if patient.allergies else []) %}
+          {% if patient.has_allergy %}
+          <div class="detail-row">
+            <strong>Allergies:</strong>
+            {% if items|length > 0 %}
+              <span class="d-inline-flex flex-wrap gap-1 ms-2">
+                {% for a in items %}
+                  <span class="badge rounded-pill text-bg-danger">{{ a }}</span>
+                {% endfor %}
+              </span>
+            {% else %}
+              <span class="badge text-bg-warning ms-2">
+                <i class="bi bi-exclamation-triangle me-1"></i> Allergy info missing
+              </span>
+            {% endif %}
+          </div>
+          {% endif %}
+          {# ---------- /Allergies ---------- #}
         </div>
       </div>
     </div>
 
-    <!-- Medical History Tab -->
-    <div class="tab-pane fade" id="medical" role="tabpanel">
-      <div class="card mt-4">
-        <div class="card-header bg-light">
-          <strong>Medical History</strong>
-        </div>
-        <div class="card-body">
-          <form method="POST" action="{{ url_for('update_medical_history', patient_id=patient._id) }}#medical">
-            <ul class="list-group list-group-flush">
-              {% set mh = patient.medical_history or {} %}
-              {% for i in range(1, 8) %}
-              <li class="list-group-item">
-                <strong>{{ i }}.</strong> 
-                {{ [
-                  "Are you in good health?",
-                  "Are you under a physician's care?",
-                  "Are you taking any kind of medication at this time?",
-                  "Any illness you have ever?",
-                  "Trouble with prolonged bleeding after surgery?",
-                  "Unusual reaction to an anesthetic or drug?",
-                  "Any other information that should be known?"
-                ][i-1] }}
-                <input type="text" class="form-control mt-2" name="q{{ i }}" value="{{ mh['q' ~ i] or '' }}">
-              </li>
-              {% endfor %}
-            </ul>
-            <div class="mt-3 text-end">
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-save"></i> Save Medical History
-              </button>
+    <!-- RIGHT COLUMN -->
+    <div class="col-12 col-md-6 col-lg-5">
+      <div class="sticky-panel"><!-- makes right cards stick on scroll -->
+
+        <!-- Recent Treatment -->
+        <div class="card card-elev mb-4">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-clipboard2-pulse text-primary"></i>
+              <span>Recent Treatment</span>
             </div>
-          </form>
+            {% if recent_treatment %}
+              <span class="badge badge-soft">
+                <i class="bi bi-calendar3 me-1"></i>
+                {% if recent_treatment.parsed_date %}
+                  {{ recent_treatment.parsed_date.strftime('%b %d, %Y') }}
+                {% else %}
+                  {{ recent_treatment.date or '-' }}
+                {% endif %}
+              </span>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            {% if recent_treatment %}
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="fw-semibold">{{ recent_treatment.treatment }}</div>
+                  {% if recent_treatment.diagnosis %}<div class="text-muted small">Dx: {{ recent_treatment.diagnosis }}</div>{% endif %}
+                  <div class="text-muted small mt-1"><i class="bi bi-clock me-1"></i>Last visit</div>
+                </div>
+                <div class="text-end">
+                  <div class="small text-muted">Fee</div>
+                  <div class="fs-5 fw-bold money">₱{{ "{:,.2f}".format(recent_treatment.fee|default(0)) }}</div>
+                </div>
+              </div>
+            {% else %}
+              <span class="text-muted">No treatments recorded yet.</span>
+            {% endif %}
+          </div>
         </div>
-      </div>
+
+        <!-- Balance Summary -->
+        <div class="card card-elev mb-4">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="bi bi-cash-coin text-primary"></i><span>Balance Summary</span>
+          </div>
+          <div class="card-body">
+            <div class="kpi mb-2"><span class="label">Total Fees</span><span class="value money">₱{{ "{:,.2f}".format(balance.total_fee|default(0)) }}</span></div>
+            <div class="kpi mb-2"><span class="label">Paid</span><span class="value text-success money">₱{{ "{:,.2f}".format(balance.total_paid|default(0)) }}</span></div>
+            {% set pct = ( (balance.total_paid or 0) / (balance.total_fee if balance.total_fee else 1) ) * 100 %}
+            <div class="progress thin my-2">
+              <div class="progress-bar {% if balance.remaining > 0 %}bg-primary{% else %}bg-success{% endif %}" style="width: {{ pct }}%"></div>
+            </div>
+            <div class="kpi mt-2">
+              <span class="label fw-semibold">Remaining</span>
+              <span class="value money {% if balance.remaining > 0 %}text-danger{% else %}text-success{% endif %}">
+                ₱{{ "{:,.2f}".format(balance.remaining|default(0)) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="card card-elev">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-folder2-open text-primary"></i><span>Documents</span>
+            </div>
+            <span class="text-muted small">X-rays, IDs, etc.</span>
+          </div>
+          <div class="card-body">
+            <form action="{{ url_for('upload_patient_doc', patient_id=patient._id) }}" method="POST" enctype="multipart/form-data" class="mb-3">
+              <div class="doc-drop" id="doc-drop">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-paperclip"></i></span>
+                  <input class="form-control" type="file" name="file" accept=".png,.jpg,.jpeg,.pdf,.svg,.webp,.dcm" required>
+                  <button class="btn btn-primary" type="submit"><i class="bi bi-upload me-1"></i>Upload</button>
+                </div>
+                <div class="form-text mt-2">Allowed: PNG, JPG, PDF, SVG, WEBP, DICOM</div>
+              </div>
+            </form>
+
+            {% if patient_docs and patient_docs|length > 0 %}
+              <ul class="list-group list-group-flush list-compact">
+                {% for d in patient_docs %}
+                  {% set icon = "bi-file-earmark" %}
+                  {% if d.content_type %}
+                    {% if "pdf" in d.content_type %}{% set icon = "bi-filetype-pdf" %}
+                    {% elif "image" in d.content_type %}{% set icon = "bi-image" %}
+                    {% elif "dicom" in d.content_type|lower %}{% set icon = "bi-hospital" %}
+                    {% endif %}
+                  {% endif %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="bi {{ icon }} text-muted"></i>
+                      <div>
+                        <div class="fw-semibold text-truncate" style="max-width:260px">{{ d.original_name }}</div>
+                        <div class="text-muted small">{{ d.content_type or 'file' }}{% if d.uploaded_at %} • {{ d.uploaded_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}</div>
+                      </div>
+                    </div>
+                    <div class="btn-group">
+                      <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('download_patient_doc', doc_id=d._id) }}"><i class="bi bi-download"></i></a>
+                      <form action="{{ url_for('delete_patient_doc', doc_id=d._id) }}" method="POST" onsubmit="return confirm('Delete this document?')">
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                      </form>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <div class="text-muted">No documents uploaded yet.</div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div><!-- /sticky-panel -->
     </div>
   </div>
 </div>
 
+
+
+<!-- Tooth Chart Tab -->
+<div class="tab-pane fade" id="tooth" role="tabpanel">
+  <!-- Card 1: Interactive Chart + Legend -->
+  <div class="card p-3">
+    <h5 class="fw-bold mb-3 text-primary">Tooth Chart</h5>
+
+    <!-- Layout: chart (left) + legend (right) -->
+    <div class="d-flex flex-column flex-lg-row align-items-stretch">
+      <!-- LEFT: SVG chart -->
+      <div class="flex-grow-1 me-lg-4">
+        <div class="tooth-container position-relative">
+          <div id="svg-container" class="border rounded bg-white" style="width:100%; height: 800px; overflow:auto;"></div>
+
+          <!-- Reset -->
+          <div class="text-end mt-3">
+            <button id="reset-tooth-chart" type="button" class="btn btn-danger btn-sm">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset All Tooth Conditions
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Legend -->
+      <div class="mt-3 mt-lg-0" style="width: 280px; max-width: 100%;">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-light fw-semibold">Legend</div>
+          <div class="card-body">
+            <ul id="legendList" class="legend-grid mb-0"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: Tooth Chart Note -->
+  <div class="card mt-3 shadow-sm">
+    <div class="card-header bg-light">
+      <strong>Chart Note</strong>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('update_tooth_notes', patient_id=patient._id) }}#tooth">
+        <textarea id="toothNotes"
+                  name="tooth_notes"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Enter any notes related to the tooth chart...">{{ patient.tooth_notes or '' }}</textarea>
+        <div class="mt-2 text-end">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Save Note
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Treatment Tab -->
+<div class="tab-pane fade" id="treatment" role="tabpanel">
+
+  <!-- Treatment Records -->
+  <div class="card mt-3">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+      <strong>Treatment Records</strong>
+
+      {% set role = session.get('user', {}).get('role') %}
+      <div class="d-flex gap-2">
+        {% if role in ['admin','dentist'] %}
+          <a class="btn btn-teal btn-sm"
+             href="{{ url_for('prescription_new', patient_id=patient._id) }}"
+             target="_blank">
+            <i class="bi bi-prescription2 me-1"></i> New Prescription
+          </a>
+          <a class="btn btn-outline-primary btn-sm"
+             href="{{ url_for('invoice_html', patient_id=patient._id) }}"
+             target="_blank">
+            <i class="bi bi-receipt me-1"></i> View Invoice
+          </a>
+          <a class="btn btn-primary btn-sm"
+             href="{{ url_for('invoice_pdf', patient_id=patient._id) }}">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download PDF
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm text-center align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:120px;">Date</th>
+              <th>Diagnosis</th>
+              <th>Treatment</th>
+              <th class="text-end" style="width:140px;">Fee</th>
+              <th class="text-end" style="width:140px;">Paid</th>
+              <th class="text-end" style="width:140px;">Balance</th>
+              <th style="width:110px;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in treatments %}
+            <tr>
+              <form method="POST" action="{{ url_for('update_treatment_inline', treatment_id=t._id) }}">
+                <td class="text-center">{{ t.date or '-' }}</td>
+                <td><input type="text" name="diagnosis" class="form-control form-control-sm" value="{{ t.diagnosis }}"></td>
+                <td><input type="text" name="treatment" class="form-control form-control-sm" value="{{ t.treatment }}"></td>
+                <td><input type="number" step="0.01" name="fee" class="form-control form-control-sm text-end" value="{{ t.fee }}"></td>
+                <td><input type="number" step="0.01" name="paid" class="form-control form-control-sm text-end" value="{{ t.paid }}"></td>
+                {% set bal = (t.fee|float) - (t.paid|float) %}
+                <td class="text-end align-middle">
+                  <strong class="{% if bal > 0 %}text-danger{% else %}text-success{% endif %}">
+                    ₱{{ "{:,.2f}".format(bal) }}
+                  </strong>
+                </td>
+                <td class="d-flex justify-content-center gap-1 align-items-center">
+                  <button type="submit" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-save"></i>
+                  </button>
+              </form>
+              <form method="POST" action="{{ url_for('remove_treatment', treatment_id=t._id) }}" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this record?')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center py-3">No treatment records found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Treatment Record -->
+  <div class="card mt-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+      <strong>Add Treatment Record</strong>
+      <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTreatmentRow()">
+        <i class="bi bi-plus-lg me-1"></i> Add Row
+      </button>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('add_treatment', patient_id=patient._id) }}#treatment">
+        <div id="treatmentRows">
+          <div class="row g-2 treatment-row mb-3">
+            <div class="col-md-2"><input type="date" name="date[]" class="form-control" required></div>
+            <div class="col-md-2"><input type="text" name="diagnosis[]" class="form-control" placeholder="Diagnosis" required></div>
+            <div class="col-md-2"><input type="text" name="treatment[]" class="form-control" placeholder="Treatment" required></div>
+            <div class="col-md-2"><input type="number" name="fee[]" class="form-control fee text-end" placeholder="Fee" step="0.01" required></div>
+            <div class="col-md-2"><input type="number" name="paid[]" class="form-control paid text-end" placeholder="Paid" step="0.01" required></div>
+            <div class="col-md-2"><input type="number" name="balance[]" class="form-control balance text-end" placeholder="Balance" readonly></div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Save All
+          </button>
+          <a href="{{ url_for('list_patients') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Back to List
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+
+    <!-- Medical History Tab -->
+<div class="tab-pane fade" id="medical" role="tabpanel">
+  <div class="card mt-2">
+    <div class="card-header bg-light">
+      <strong>Medical History</strong>
+    </div>
+    <div class="card-body p-3">
+      <form method="POST" action="{{ url_for('update_medical_history', patient_id=patient._id) }}#medical">
+        <ul class="list-group list-group-flush">
+          {% set mh = patient.medical_history or {} %}
+          {% for i in range(1, 8) %}
+          <li class="list-group-item">
+            <strong>{{ i }}.</strong> 
+            {{ [
+              "Are you in good health?",
+              "Are you under a physician's care?",
+              "Are you taking any kind of medication at this time?",
+              "Any illness you have ever?",
+              "Trouble with prolonged bleeding after surgery?",
+              "Unusual reaction to an anesthetic or drug?",
+              "Any other information that should be known?"
+            ][i-1] }}
+            <input type="text" class="form-control mt-2" name="q{{ i }}" value="{{ mh['q' ~ i] or '' }}">
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="mt-3 text-end">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Save Medical History
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 <!-- Treatment Row Script -->
 <script>
-function addTreatmentRow() {
-  const container = document.getElementById("treatmentRows");
-  const newRow = document.createElement("div");
-  newRow.className = "row g-2 treatment-row mb-3";
-  newRow.innerHTML = `
-    <div class="col-md-2"><input type="date" name="date[]" class="form-control" required></div>
-    <div class="col-md-2"><input type="text" name="diagnosis[]" class="form-control" placeholder="Diagnosis" required></div>
-    <div class="col-md-2"><input type="text" name="treatment[]" class="form-control" placeholder="Treatment" required></div>
-    <div class="col-md-2"><input type="number" name="fee[]" class="form-control fee" placeholder="Fee" required></div>
-    <div class="col-md-2"><input type="number" name="paid[]" class="form-control paid" placeholder="Paid" required></div>
-    <div class="col-md-2"><input type="number" name="balance[]" class="form-control balance" placeholder="Balance" readonly></div>
-  `;
-  container.appendChild(newRow);
-  attachListeners(newRow);
-}
-
-function attachListeners(row) {
-  const feeInput = row.querySelector(".fee");
-  const paidInput = row.querySelector(".paid");
-  const balanceInput = row.querySelector(".balance");
-
-  function updateBalance() {
-    const fee = parseFloat(feeInput.value) || 0;
-    const paid = parseFloat(paidInput.value) || 0;
-    balanceInput.value = (fee - paid).toFixed(2);
-  }
-
-  feeInput.addEventListener("input", updateBalance);
-  paidInput.addEventListener("input", updateBalance);
-}
-
 document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".treatment-row").forEach(attachListeners);
+  // enable Bootstrap tooltips if any
+  try {
+    const tips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tips.forEach(el => new bootstrap.Tooltip(el));
+  } catch(e) {}
 
-  const hash = window.location.hash;
-  if (hash) {
-    const tabTrigger = document.querySelector(`button[data-bs-target="${hash}"]`);
-    if (tabTrigger) new bootstrap.Tab(tabTrigger).show();
+  // ---- palette (your existing colors) ----
+  const conditionColors = {
+    "C": "#ffb3ba", "M": "#ffdfba", "F": "#ffffba", "Un": "#baffc9",
+    "PD": "#bae1ff", "Fc": "#e0bbff", "Ab": "#c2f0c2", "P": "#f1cbff",
+    "PJC": "#d3e6ff", "CLA": "#ffc2d1", "RRF": "#ffd3b6"
+  };
+  const VALID = new Set(Object.keys(conditionColors));
+  const patientId = "{{ patient._id }}";
+  let selectedToothId = null;
+
+  // ---- LEGEND (render + preselect dropdown on click) ----
+  (function renderLegend(){
+    const list = document.getElementById("legendList");
+    if (!list) return;
+
+    const legendLabels = {
+      "C": "C - Caries",
+      "M": "M - Missing tooth due to extraction",
+      "F": "F - Filled tooth",
+      "Un": "Un - Unerrupted",
+      "PD": "PD - Partial Denture",
+      "Fc": "Fc - Filled w/ recurrent caries",
+      "Ab": "Ab - Abutment",
+      "P": "P - Pontic/Bridge",
+      "PJC": "PJC - Plastic Jacket Crown",
+      "CLA": "CLA - Clasp",
+      "RRF": "RRF - Retained Root Fragment"
+    };
+
+    list.innerHTML = "";
+    Object.keys(conditionColors).forEach(code => {
+      const li = document.createElement("li");
+      li.className = "legend-item";
+      li.dataset.code = code;
+
+      const sw = document.createElement("span");
+      sw.className = "legend-swatch";
+      sw.style.background = conditionColors[code];
+
+      const label = document.createElement("span");
+      label.className = "legend-text";
+      label.textContent = legendLabels[code] || code;
+
+      li.appendChild(sw);
+      li.appendChild(label);
+      list.appendChild(li);
+    });
+
+    // Click legend -> set popup dropdown value (no auto-save)
+    list.addEventListener("click", (e) => {
+      const li = e.target.closest(".legend-item");
+      if (!li) return;
+      const code = li.dataset.code;
+      const select = document.getElementById("condition-select");
+      if (select) select.value = code;
+    }, { passive:true });
+  })();
+
+  // ---- helpers for SVG coloring (your existing approach) ----
+  const root = () => document.getElementById('svg-container');
+
+  function getToothGroup(n) {
+    const r = root(); if (!r) return null;
+    return r.querySelector(`#tooth-${n}[data-tooth="${n}"]`)
+        || r.querySelector(`#tooth-${n}`)
+        || r.querySelector(`[data-tooth="${n}"]`);
   }
+
+  // choose the main outline shape (largest bbox) so only the tooth fills, not inner lines
+  function getMainShape(groupEl) {
+    if (!groupEl) return null;
+    let candidates = Array.from(groupEl.querySelectorAll(':scope > use.tooth, :scope > path, :scope > rect, :scope > ellipse, :scope > circle, :scope > polygon'));
+    if (candidates.length === 0) {
+      candidates = Array.from(groupEl.querySelectorAll('use.tooth, path, rect, ellipse, circle, polygon'));
+    }
+    if (candidates.length === 0) return null;
+    let best = null, bestArea = -1;
+    for (const el of candidates) {
+      try {
+        const bb = el.getBBox();
+        const area = bb.width * bb.height;
+        if (area > bestArea) { bestArea = area; best = el; }
+      } catch (_) {}
+    }
+    return best;
+  }
+
+  function setFillImportant(el, color) {
+    if (!el) return;
+    if (color) {
+      el.style.setProperty('fill', color, 'important'); // beat fill="none"
+      if (!el.getAttribute('stroke')) el.setAttribute('stroke', '#111827');
+    } else {
+      el.style.removeProperty('fill');
+      el.removeAttribute('fill');
+    }
+  }
+
+  function colorTooth(toothNumber, hexColor) {
+    const g = getToothGroup(toothNumber);
+    const main = getMainShape(g);
+    setFillImportant(main, hexColor);
+  }
+
+  function clearTooth(toothNumber) {
+    colorTooth(toothNumber, null);
+  }
+
+  async function fetchConditions() {
+    try {
+      const r = await fetch(`/api/tooth-conditions/${patientId}`);
+      if (!r.ok) throw new Error(r.status);
+      return await r.json(); // { "1": "C", ... }
+    } catch {
+      return {};
+    }
+  }
+
+  // ---- load SVG then wire up ----
+  fetch('{{ url_for("static", filename="images/tooth_labeled.svg") }}')
+    .then(res => res.text())
+    .then(async svg => {
+      document.getElementById('svg-container').innerHTML = svg.replace(/<\?xml.*?\?>/, "").trim();
+
+      // apply from DB — ONLY if the code is valid
+      const dbConds = await fetchConditions();
+      Object.entries(dbConds || {}).forEach(([tooth, cond]) => {
+        if (VALID.has(cond)) {
+          colorTooth(tooth, conditionColors[cond]);
+        }
+      });
+
+      // click → open popup
+      document.querySelectorAll('#svg-container [id^="tooth-"]').forEach(g => {
+        g.style.cursor = 'pointer';
+        g.addEventListener('click', () => {
+          const id = g.getAttribute('data-tooth') || g.id.replace('tooth-','');
+          selectedToothId = id;
+          document.getElementById('popup-title').innerText = `Tooth ${selectedToothId}`;
+          // prefill dropdown with current value if known
+          const current = (dbConds && dbConds[id]) ? dbConds[id] : "";
+          const select = document.getElementById('condition-select');
+          if (select) select.value = current;
+          document.getElementById('condition-popup').style.display = 'block';
+        });
+      });
+
+      // save from popup
+      document.getElementById('save-condition')?.addEventListener('click', async () => {
+        const cond = document.getElementById('condition-select').value;
+        if (!selectedToothId) return;
+
+        // local update: color only if cond is a valid code; otherwise clear
+        if (VALID.has(cond)) colorTooth(selectedToothId, conditionColors[cond]);
+        else clearTooth(selectedToothId);
+
+        // persist (empty clears on server)
+        try {
+          await fetch(`/save-tooth-condition/${patientId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tooth: String(selectedToothId), condition: cond || "" })
+          });
+          if (cond) dbConds[selectedToothId] = cond;
+          else delete dbConds[selectedToothId];
+        } catch (e) {
+          console.error(e);
+          alert("Failed to save condition.");
+        }
+
+        document.getElementById('condition-popup').style.display = 'none';
+      });
+
+      // reset all
+      document.getElementById('reset-tooth-chart')?.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to clear all tooth conditions?')) return;
+
+        document.querySelectorAll('#svg-container [id^="tooth-"]').forEach(g => {
+          const main = getMainShape(g);
+          if (main) { main.style.removeProperty('fill'); main.removeAttribute('fill'); }
+        });
+
+        try { await fetch(`/reset-tooth-condition/${patientId}`, { method: 'POST' }); } catch {}
+        alert('Tooth chart has been reset.');
+      });
+    });
 });
 </script>
+
 {% endblock %}

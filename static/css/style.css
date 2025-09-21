@@ -97,11 +97,7 @@ body {
   min-height: 100vh;
   background-color: #f9f9f9;
 }
-.dashboard-grid {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
+
 .card {
   flex: 1;
   background: #2196f3;
@@ -122,12 +118,7 @@ body {
   padding: 8px;
   font-size: 14px;
 }
-.dashboard-actions {
-  display: flex;
-  flex-direction: column;
-  width: 200px;
-  margin-bottom: 30px;
-}
+
 .action-button {
   display: block;
   background: #2196f3;
@@ -420,4 +411,306 @@ textarea {
   right: 10px;
   opacity: 0.1;
 }
+ .svg-container svg {
+    width: 100%;
+    height: auto;
+    max-width: 786px; /* Adjust this to your preferred size */
+    display: block;
+    margin: auto;
+  }
 
+svg [data-tooth] {
+  pointer-events: all;
+  cursor: pointer;
+  stroke: black;
+  transition: fill 0.2s ease;
+}
+
+
+  @media (max-width: 768px) {
+  #condition-popup {
+    bottom: 10px !important;
+    right: 10px !important;
+    width: 90% !important;
+  }
+}
+
+  .legend-grid{
+    list-style:none; padding:0; margin:0;
+    display:grid; grid-template-columns: 1fr; gap:8px 12px;
+  }
+  .legend-item{ display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .legend-item:hover{ background:#f8f9fa; border-radius:4px; }
+  .legend-swatch{ width:16px; height:16px; border:1px solid #999; border-radius:3px; flex:0 0 16px; }
+  .legend-text{ font-size:.9rem; }
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+}
+.legend-item:hover {
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+.legend-swatch {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  flex-shrink: 0;
+}
+.legend-text {
+  font-size: 14px;
+}
+#toothNotes { background-color: #fff; border: 1px solid #e3e3e3; }
+
+.badge.bg-primary   { background-color: #0d6efd !important; }
+.badge.bg-success   { background-color: #198754 !important; }
+.badge.bg-secondary { background-color: #6c757d !important; }
+
+/* ===== Patient Overview Cards ===== */
+.card-elev {
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(13,110,253,.06);
+  overflow: hidden;
+}
+.card-elev .card-header {
+  background: linear-gradient(135deg, rgba(13,110,253,.08), rgba(13,110,253,.02));
+  border-bottom: 1px solid rgba(13,110,253,.15);
+  font-weight: 600;
+}
+
+.left-card .list-group-item {
+  padding: .85rem 0;
+  border-color: #eef2f6;
+}
+.left-card .list-group-item strong {
+  display: inline-block;
+  min-width: 110px;
+  color: #334155;
+}
+
+/* KPI rows */
+.kpi { display:flex; align-items:baseline; justify-content:space-between; }
+.kpi .label { font-size:.9rem; color:#6c757d; }
+.kpi .value { font-weight:700; font-size:1.05rem; }
+
+/* Progress */
+.progress.thin { height: 6px; background: #eef2f6; border-radius: 999px; }
+.progress.thin .progress-bar { border-radius: 999px; }
+
+/* Documents */
+.doc-drop {
+  border: 2px dashed #ced4da;
+  border-radius: 14px;
+  padding: 12px;
+  background: #f8fafc;
+  transition: all .15s ease;
+}
+.doc-drop:hover { border-color:#0d6efd; background:#f2f7ff; }
+.list-compact .list-group-item { padding: .6rem .75rem; }
+
+/* Badges */
+.badge-soft {
+  background: rgba(13,110,253,.1);
+  color: #0d6efd;
+  border: 1px solid rgba(13,110,253,.2);
+}
+
+/* Small utilities */
+.text-muted-2 { color:#7a8899!important; }
+
+/* ==== Patient Profile Header ==== */
+.profile-header {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(13,110,253,.08), rgba(13,110,253,.02));
+  border-bottom: 1px solid rgba(13,110,253,.15);
+}
+.avatar-xl {
+  width: 56px; height: 56px; border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:1.1rem;
+  background:#e9f1ff; color:#0d6efd; border:1px solid #dbe7ff;
+}
+.branch-pill {
+  border: 1px solid rgba(13,110,253,.2);
+  background: rgba(13,110,253,.08);
+  color:#0d6efd; font-weight:600; padding:.15rem .5rem; border-radius:999px;
+}
+.detail-row strong { color:#334155; min-width:120px; display:inline-block; }
+.detail-row { padding:.7rem 0; border-bottom:1px solid #eef2f6; }
+.detail-row:last-child { border-bottom:0; }
+
+.quick-actions .btn { padding:.25rem .5rem; }
+
+
+@media (min-width: 992px){
+  .sticky-panel { position: sticky; top: 84px; }
+}
+.money { font-variant-numeric: tabular-nums; }
+
+
+.page-header .branch-pill { display: none !important; }
+
+
+
+/* === Dashboard KPI cards === */
+.kpi-card{
+  border: 0;
+  border-radius: 16px;
+  padding: 16px;
+  height: 100%;
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+
+.kpi-link{
+  display: block;
+  text-decoration: none;
+  color: inherit;                 /* keep card text colors */
+}
+.kpi-link:hover,
+.kpi-link:focus{
+  color: inherit;                 /* no blue link color on hover */
+}
+
+.kpi-card:hover,
+.kpi-card:focus{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  opacity: .98;
+}
+
+/* nice even-width digits for money */
+.money{ font-variant-numeric: tabular-nums; }
+
+/* optional: thin progress bars you use elsewhere too */
+.progress.thin{ height: 6px; }
+
+/* accessibility: disable motion if the user prefers reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .kpi-card{ transition: none; }
+}
+
+/* KPI tiles */
+.kpi-card{
+  position: relative;                /* needed for .stretched-link */
+  border: 0;
+  border-radius: 16px;
+  padding: 16px;
+  height: 100%;
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+.kpi-card:hover{ transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.12); opacity: .98; }
+
+.kpi-link{ text-decoration: none; color: inherit; display: block; }
+.kpi-link:hover, .kpi-link:focus{ color: inherit; }
+
+/* even-width digits for counters and money */
+.money{ font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce){
+  .kpi-card{ transition: none; }
+}
+
+
+/* ===== brand palette ===== */
+:root{
+  --c-surface: #F6F8FB;   /* page background */
+  --c-primary: #2563EB;   /* total patients (blue) */
+  --c-teal:    #0EA5A5;   /* appointments (teal) */
+  --c-amber:   #F59E0B;   /* finance (amber) */
+  --c-green:   #16A34A;   /* birthdays / success (green) */
+  --c-on-dark:#FFFFFF;    /* text on dark tiles */
+  --c-on-light:#111827;   /* text on light tiles */
+}
+
+body{ background: var(--c-surface); }
+
+/* ===== only style the summary KPI cards row (your 4 tiles) ===== */
+/* works with your current markup: .row.g-3.mb-4 > .col-md-3 > .card.rounded-4 */
+.row.g-3.mb-4 > [class^="col-"] > .card.rounded-4{
+  border: 0;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.row.g-3.mb-4 > [class^="col-"] > .card.rounded-4:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+.row.g-3.mb-4 .card i{ opacity:.9; color: inherit; }
+
+/* backgrounds + text colors mapped to your existing Bootstrap bg-* classes */
+.row.g-3.mb-4 .card.bg-primary{ background: var(--c-primary)!important; color: var(--c-on-dark)!important; }
+.row.g-3.mb-4 .card.bg-info   { background: var(--c-teal)!important;    color: var(--c-on-dark)!important; }
+.row.g-3.mb-4 .card.bg-warning{ background: var(--c-amber)!important;   color: var(--c-on-light)!important; }
+.row.g-3.mb-4 .card.bg-success{ background: var(--c-green)!important;   color: var(--c-on-dark)!important; }
+
+/* fix link/text utilities inside the tiles so they read correctly */
+.row.g-3.mb-4 .card.bg-info a,
+.row.g-3.mb-4 .card.bg-primary a,
+.row.g-3.mb-4 .card.bg-success a{ color: var(--c-on-dark)!important; }
+.row.g-3.mb-4 .card.bg-warning a{ color: var(--c-on-light)!important; }
+
+/* progress bars (e.g., finance paid bar) */
+.progress .progress-bar{ background-color: var(--c-green); }
+
+/* optional: lighten tile icons on hover a bit */
+/* .row.g-3.mb-4 .card:hover i{ filter: brightness(1.05); } */
+
+
+
+  /* Keep actions visible at the bottom of the tab content */
+  #treatment .treatment-actions-sticky {
+    position: sticky; bottom: 0; z-index: 5;
+    background: var(--bs-body-bg); /* matches Bootstrap theme */
+  }
+
+  .btn-teal {
+  --bs-btn-bg: #0d9488;
+  --bs-btn-border-color: #0d9488;
+  --bs-btn-color: #fff;
+  --bs-btn-hover-bg: #0b7d74;
+  --bs-btn-hover-border-color: #0b7d74;
+  --bs-btn-active-bg: #0a6c63;
+  --bs-btn-active-border-color: #0a6c63;
+}
+
+  .finance-dash .kpi-card{border:0;border-radius:14px;box-shadow:0 4px 18px rgba(10,30,70,.05)}
+  .finance-dash .kpi-label{font-size:.82rem;font-weight:700;opacity:.7;margin-bottom:.15rem}
+  .finance-dash .kpi-value{font-size:1.6rem;font-weight:800;letter-spacing:.2px}
+  .finance-dash .kpi-icon{font-size:1.6rem;opacity:.25}
+  .finance-dash .kpi-billed{background:linear-gradient(180deg,#eef5ff 0%,#fff 70%)}
+  .finance-dash .kpi-collected{background:linear-gradient(180deg,#e9fff2 0%,#fff 70%)}
+  .finance-dash .kpi-outstanding{background:linear-gradient(180deg,#fff0f0 0%,#fff 70%)}
+
+  .finance-dash .chart-body{
+    min-height:320px; display:flex; align-items:center; justify-content:center;
+  }
+  .finance-dash .empty-state{ text-align:center; color:#6c757d; }
+  .finance-dash .empty-state i{ font-size:1.6rem; display:block; }
+
+/* theme vars */
+:root { --violet: #7c4dff; }
+
+/* sidebar basics */
+.sidebar .nav-link { color:#cfd8dc; padding:.45rem .75rem; border-radius:.5rem; }
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active { background:rgba(255,255,255,.08); color:#fff; }
+.sidebar .dropdown-menu { font-size:.9rem; }
+.sidebar .btn.btn-dark { --bs-btn-bg:#0f1b24; --bs-btn-border-color:#0f1b24; }
+
+/* violet group toggles */
+.sidebar .group-toggle { color:var(--violet) !important; font-weight:600; }
+.sidebar .group-toggle .bi { color:var(--violet) !important; }
+.sidebar .group-toggle .chev { transition: transform .2s; }
+.sidebar .group-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+/* (optional) slightly tighter spacing between groups */
+.sidebar .nav-link.group-toggle { margin-top:.25rem; }

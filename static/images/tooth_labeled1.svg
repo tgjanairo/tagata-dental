@@ -1,0 +1,133 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1000 1000">
+	<g id="tight-dental-arch">
+		<g data-tooth="1" id="tooth1">
+			<circle cx="151.49303829673795" cy="317.70607418784425" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="151.49303829673795" y="323.70607418784425" text-anchor="middle" font-size="14" fill="#000">1</text>
+		</g>
+		<g data-tooth="2" id="tooth2">
+			<circle cx="163.36102488951332" cy="254.217953474771" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="163.36102488951332" y="260.217953474771" text-anchor="middle" font-size="14" fill="#000">2</text>
+		</g>
+		<g data-tooth="3" id="tooth3">
+			<circle cx="186.69284802572815" cy="193.99157547821164" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="186.69284802572815" y="199.99157547821164" text-anchor="middle" font-size="14" fill="#000">3</text>
+		</g>
+		<g data-tooth="4" id="tooth4">
+			<circle cx="220.69397045191613" cy="139.07787726726033" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="220.69397045191613" y="145.07787726726033" text-anchor="middle" font-size="14" fill="#000">4</text>
+		</g>
+		<g data-tooth="5" id="tooth5">
+			<circle cx="264.2065247237049" cy="91.34687897276933" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="264.2065247237049" y="97.34687897276933" text-anchor="middle" font-size="14" fill="#000">5</text>
+		</g>
+		<g data-tooth="6" id="tooth6">
+			<circle cx="315.7487429929254" cy="52.42400249463509" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="315.7487429929254" y="58.42400249463509" text-anchor="middle" font-size="14" fill="#000">6</text>
+		</g>
+		<g data-tooth="7" id="tooth7">
+			<circle cx="373.56541683449643" cy="23.634719708475473" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="373.56541683449643" y="29.634719708475473" text-anchor="middle" font-size="14" fill="#000">7</text>
+		</g>
+		<g data-tooth="8" id="tooth8">
+			<circle cx="435.6876687642005" cy="5.959415110634325" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="435.6876687642005" y="11.959415110634325" text-anchor="middle" font-size="14" fill="#000">8</text>
+		</g>
+		<g data-tooth="9" id="tooth9">
+			<circle cx="499.99999999999994" cy="0.0" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="499.99999999999994" y="6.0" text-anchor="middle" font-size="14" fill="#000">9</text>
+		</g>
+		<g data-tooth="10" id="tooth10">
+			<circle cx="564.3123312357997" cy="5.959415110634382" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="564.3123312357997" y="11.959415110634382" text-anchor="middle" font-size="14" fill="#000">10</text>
+		</g>
+		<g data-tooth="11" id="tooth11">
+			<circle cx="626.4345831655035" cy="23.634719708475416" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="626.4345831655035" y="29.634719708475416" text-anchor="middle" font-size="14" fill="#000">11</text>
+		</g>
+		<g data-tooth="12" id="tooth12">
+			<circle cx="684.2512570070745" cy="52.42400249463509" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="684.2512570070745" y="58.42400249463509" text-anchor="middle" font-size="14" fill="#000">12</text>
+		</g>
+		<g data-tooth="13" id="tooth13">
+			<circle cx="735.7934752762949" cy="91.34687897276922" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="735.7934752762949" y="97.34687897276922" text-anchor="middle" font-size="14" fill="#000">13</text>
+		</g>
+		<g data-tooth="14" id="tooth14">
+			<circle cx="779.3060295480838" cy="139.07787726726022" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="779.3060295480838" y="145.07787726726022" text-anchor="middle" font-size="14" fill="#000">14</text>
+		</g>
+		<g data-tooth="15" id="tooth15">
+			<circle cx="813.3071519742718" cy="193.99157547821167" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="813.3071519742718" y="199.99157547821167" text-anchor="middle" font-size="14" fill="#000">15</text>
+		</g>
+		<g data-tooth="16" id="tooth16">
+			<circle cx="836.6389751104866" cy="254.2179534747709" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="836.6389751104866" y="260.21795347477087" text-anchor="middle" font-size="14" fill="#000">16</text>
+		</g>
+		<g data-tooth="17" id="tooth17">
+			<circle cx="151.49303829673795" cy="632.2939258121557" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="151.49303829673795" y="638.2939258121557" text-anchor="middle" font-size="14" fill="#000">17</text>
+		</g>
+		<g data-tooth="18" id="tooth18">
+			<circle cx="163.36102488951332" cy="695.782046525229" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="163.36102488951332" y="701.782046525229" text-anchor="middle" font-size="14" fill="#000">18</text>
+		</g>
+		<g data-tooth="19" id="tooth19">
+			<circle cx="186.69284802572815" cy="756.0084245217884" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="186.69284802572815" y="762.0084245217884" text-anchor="middle" font-size="14" fill="#000">19</text>
+		</g>
+		<g data-tooth="20" id="tooth20">
+			<circle cx="220.69397045191613" cy="810.9221227327397" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="220.69397045191613" y="816.9221227327397" text-anchor="middle" font-size="14" fill="#000">20</text>
+		</g>
+		<g data-tooth="21" id="tooth21">
+			<circle cx="264.2065247237049" cy="858.6531210272307" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="264.2065247237049" y="864.6531210272307" text-anchor="middle" font-size="14" fill="#000">21</text>
+		</g>
+		<g data-tooth="22" id="tooth22">
+			<circle cx="315.7487429929254" cy="897.575997505365" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="315.7487429929254" y="903.575997505365" text-anchor="middle" font-size="14" fill="#000">22</text>
+		</g>
+		<g data-tooth="23" id="tooth23">
+			<circle cx="373.56541683449643" cy="926.3652802915245" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="373.56541683449643" y="932.3652802915245" text-anchor="middle" font-size="14" fill="#000">23</text>
+		</g>
+		<g data-tooth="24" id="tooth24">
+			<circle cx="435.6876687642005" cy="944.0405848893656" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="435.6876687642005" y="950.0405848893656" text-anchor="middle" font-size="14" fill="#000">24</text>
+		</g>
+		<g data-tooth="25" id="tooth25">
+			<circle cx="499.99999999999994" cy="950.0" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="499.99999999999994" y="956.0" text-anchor="middle" font-size="14" fill="#000">25</text>
+		</g>
+		<g data-tooth="26" id="tooth26">
+			<circle cx="564.3123312357997" cy="944.0405848893656" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="564.3123312357997" y="950.0405848893656" text-anchor="middle" font-size="14" fill="#000">26</text>
+		</g>
+		<g data-tooth="27" id="tooth27">
+			<circle cx="626.4345831655035" cy="926.3652802915246" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="626.4345831655035" y="932.3652802915246" text-anchor="middle" font-size="14" fill="#000">27</text>
+		</g>
+		<g data-tooth="28" id="tooth28">
+			<circle cx="684.2512570070745" cy="897.575997505365" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="684.2512570070745" y="903.575997505365" text-anchor="middle" font-size="14" fill="#000">28</text>
+		</g>
+		<g data-tooth="29" id="tooth29">
+			<circle cx="735.7934752762949" cy="858.6531210272308" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="735.7934752762949" y="864.6531210272308" text-anchor="middle" font-size="14" fill="#000">29</text>
+		</g>
+		<g data-tooth="30" id="tooth30">
+			<circle cx="779.3060295480838" cy="810.9221227327398" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="779.3060295480838" y="816.9221227327398" text-anchor="middle" font-size="14" fill="#000">30</text>
+		</g>
+		<g data-tooth="31" id="tooth31">
+			<circle cx="813.3071519742718" cy="756.0084245217884" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="813.3071519742718" y="762.0084245217884" text-anchor="middle" font-size="14" fill="#000">31</text>
+		</g>
+		<g data-tooth="32" id="tooth32">
+			<circle cx="836.6389751104866" cy="695.7820465252291" r="30" fill="#cccccc" stroke="#333" stroke-width="2"/>
+			<text x="836.6389751104866" y="701.7820465252291" text-anchor="middle" font-size="14" fill="#000">32</text>
+		</g>
+	</g>
+</svg>

@@ -35,21 +35,26 @@
       <form method="POST" class="needs-validation" novalidate>
 
         <!-- Patient Selection -->
-        <div class="mb-3">
-          <label for="patient_name" class="form-label fw-semibold">Patient:</label>
-          <select name="patient_name" id="patient_name" class="form-select" required>
-            <option value="" disabled selected>Select Patient</option>
-            {% for p in patients %}
-              <option value="{{ p.first_name }} {{ p.last_name }}">{{ p.first_name }} {{ p.last_name }}</option>
-            {% endfor %}
-          </select>
-          <div class="invalid-feedback">Please select a patient.</div>
-        </div>
+<div class="mb-3">
+  <label for="patient_name" class="form-label fw-semibold">Patient:</label>
+  <select name="patient_name" id="patient_name" class="form-select" required>
+    <!-- Placeholder stays selected only when no suggested_name -->
+    <option value="" disabled {{ '' == (suggested_name or '') and 'selected' or '' }}>Select Patient</option>
+
+    {% for p in patients %}
+      {% set full = (p.first_name ~ ' ' ~ p.last_name).strip() %}
+      <option value="{{ full }}" {{ 'selected' if full == (suggested_name or '') else '' }}>
+        {{ full }}
+      </option>
+    {% endfor %}
+  </select>
+  <div class="invalid-feedback">Please select a patient.</div>
+</div>
 
         <!-- Dentist Name -->
         <div class="mb-3">
           <label for="dentist" class="form-label fw-semibold">Dentist:</label>
-          <input type="text" name="dentist" id="dentist" class="form-control" value="Terrence Janairo" required>
+          <input type="text" name="dentist" id="dentist" class="form-control" value="" required>
           <div class="invalid-feedback">Please enter dentist name.</div>
         </div>
 

@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="fw-bold mb-3"><i class="bi bi-prescription2 me-2"></i>New Prescription</h4>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="mb-3">
+        <div class="fw-semibold">Patient:</div>
+        <div>{{ patient.last_name|upper }}, {{ patient.first_name }}</div>
+      </div>
+
+      <form method="POST">
+        <div id="rxRows">
+          <div class="row g-2 align-items-end rx-row mb-2">
+            <div class="col-md-3">
+              <label class="form-label">Medicine</label>
+              <input class="form-control" name="med_name[]" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Dosage</label>
+              <input class="form-control" name="dosage[]" placeholder="e.g., 500 mg">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Frequency</label>
+              <input class="form-control" name="frequency[]" placeholder="e.g., 1 tab TID">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Duration</label>
+              <input class="form-control" name="duration[]" placeholder="e.g., 5 days">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Instructions</label>
+              <input class="form-control" name="instructions[]" placeholder="e.g., after meals">
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-2">
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="addRxRow()">
+            <i class="bi bi-plus-lg me-1"></i> Add Medicine
+          </button>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">Notes (optional)</label>
+          <textarea class="form-control" name="notes" rows="3"
+            placeholder="General directions, cautions, or advice…"></textarea>
+        </div>
+
+        <div class="text-end mt-3">
+          <button class="btn btn-success">
+            <i class="bi bi-check2-circle me-1"></i> Save & Print
+          </button>
+          <a href="{{ url_for('view_patient', patient_id=patient._id) }}#treatment" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function addRxRow() {
+  const r = document.querySelector('.rx-row');
+  const clone = r.cloneNode(true);
+  clone.querySelectorAll('input').forEach(i => i.value = '');
+  document.getElementById('rxRows').appendChild(clone);
+}
+</script>
+{% endblock %}

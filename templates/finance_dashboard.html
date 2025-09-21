@@ -1,0 +1,232 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-4 finance-dash">
+  <h4 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow me-2"></i>Finance Dashboard</h4>
+
+  <!-- Filters -->
+  <form class="row g-2 mb-3" method="GET">
+    <div class="col-auto">
+      <label class="form-label small mb-1">From</label>
+      <input type="date" class="form-control" name="from"
+             value="{{ d_from.strftime('%Y-%m-%d') if d_from else '' }}">
+    </div>
+
+    <div class="col-auto">
+      <label class="form-label small mb-1">To</label>
+      <input type="date" class="form-control" name="to"
+             value="{{ d_to.strftime('%Y-%m-%d') if d_to else '' }}">
+    </div>
+
+    <div class="col-auto align-self-end">
+      <button class="btn btn-primary"><i class="bi bi-filter me-1"></i>Apply</button>
+    </div>
+  </form>
+
+  <!-- KPI cards -->
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <div class="card kpi-card kpi-billed shadow-sm h-100">
+        <div class="card-body d-flex justify-content-between">
+          <div>
+            <div class="kpi-label">Billed (period)</div>
+            <div class="kpi-value">₱{{ "{:,.2f}".format(kpi_total_billed) }}</div>
+          </div>
+          <i class="bi bi-receipt-cutoff kpi-icon"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card kpi-card kpi-collected shadow-sm h-100">
+        <div class="card-body d-flex justify-content-between">
+          <div>
+            <div class="kpi-label">Collected (period)</div>
+            <div class="kpi-value text-success">₱{{ "{:,.2f}".format(kpi_total_collected) }}</div>
+          </div>
+          <i class="bi bi-cash-coin kpi-icon"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card kpi-card kpi-outstanding shadow-sm h-100">
+        <div class="card-body d-flex justify-content-between">
+          <div>
+            <div class="kpi-label">Outstanding (all time)</div>
+            <div class="kpi-value text-danger">₱{{ "{:,.2f}".format(kpi_total_outstanding) }}</div>
+          </div>
+          <i class="bi bi-exclamation-octagon-fill kpi-icon text-danger"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-light fw-semibold">Daily Billed vs Collected</div>
+        <div class="card-body chart-body">
+          {% if daily and daily|length %}
+            <canvas id="dailyChart"></canvas>
+          {% else %}
+            <div class="empty-state">
+              <i class="bi bi-clipboard2-x mb-2"></i>
+              <div class="text-muted">No data for the selected period.</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-light fw-semibold">Monthly Billed vs Collected</div>
+        <div class="card-body chart-body">
+          {% if monthly and monthly|length %}
+            <canvas id="monthlyChart"></canvas>
+          {% else %}
+            <div class="empty-state">
+              <i class="bi bi-clipboard2-x mb-2"></i>
+              <div class="text-muted">No monthly data yet.</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-lg-7">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-light fw-semibold">Dentist Productivity</div>
+        <div class="card-body chart-body">
+          {% if dentist and dentist|length %}
+            <canvas id="dentistChart"></canvas>
+          {% else %}
+            <div class="empty-state">
+              <i class="bi bi-graph-down mb-2"></i>
+              <div class="text-muted">No productivity data for this period.</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-light fw-semibold">Top Outstanding Balances</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0 align-middle">
+              <thead class="table-light">
+                <tr><th>Patient</th><th class="text-end">Balance</th></tr>
+              </thead>
+              <tbody>
+                {% for r in outstanding %}
+                  <tr>
+                    <td class="text-truncate">{{ r.name or 'Unknown' }}</td>
+                    <td class="text-end text-danger fw-semibold">₱{{ "{:,.2f}".format(r.balance) }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="2" class="py-4">
+                      <div class="empty-state">
+                        <i class="bi bi-check2-circle mb-2"></i>
+                        <div class="text-muted">No outstanding balances.</div>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+<script>
+  // Data from server (renamed to avoid collisions with any global 'daily', 'monthly', 'dentist')
+  const dataDaily   = {{ daily|tojson }};
+  const dataMonthly = {{ monthly|tojson }};
+  const dataDentist = {{ dentist|tojson }};
+
+  // Helpers
+  const peso   = v => '₱' + Number(v ?? 0).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
+  const dateFmt = s => new Date(s).toLocaleDateString(undefined,{month:'short', day:'2-digit'});
+
+  // DAILY
+  if (Array.isArray(dataDaily) && dataDaily.length){
+    const labels = dataDaily.map(x => dateFmt(x._id));
+    new Chart(document.getElementById('dailyChart'), {
+      type:'line',
+      data:{
+        labels,
+        datasets:[
+          { label:'Billed',    data: dataDaily.map(x=>x.billed),    borderWidth:2, tension:.2 },
+          { label:'Collected', data: dataDaily.map(x=>x.collected), borderWidth:2, tension:.2 }
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true},
+          tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${peso(ctx.parsed.y)}`}}
+        },
+        scales:{ y:{ ticks:{ callback:value=>peso(value) } } }
+      }
+    });
+  }
+
+  // MONTHLY
+  if (Array.isArray(dataMonthly) && dataMonthly.length){
+    const labels = dataMonthly.map(x => new Date(x._id).toLocaleDateString(undefined,{year:'numeric', month:'short'}));
+    new Chart(document.getElementById('monthlyChart'), {
+      type:'bar',
+      data:{
+        labels,
+        datasets:[
+          { label:'Billed',    data: dataMonthly.map(x=>x.billed) },
+          { label:'Collected', data: dataMonthly.map(x=>x.collected) }
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true},
+          tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${peso(ctx.parsed.y)}`}}
+        },
+        scales:{ y:{ ticks:{ callback:value=>peso(value) } } }
+      }
+    });
+  }
+
+  // DENTIST (Horizontal bar)
+  if (Array.isArray(dataDentist) && dataDentist.length){
+    const labels = dataDentist.map(x => x._id || 'Unknown');
+    new Chart(document.getElementById('dentistChart'), {
+      type:'bar',
+      data:{
+        labels,
+        datasets:[
+          { label:'Billed',    data: dataDentist.map(x=>x.billed) },
+          { label:'Collected', data: dataDentist.map(x=>x.collected) }
+        ]
+      },
+      options:{
+        indexAxis:'y',
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true},
+          tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${peso(ctx.parsed.x)}`}}
+        },
+        scales:{ x:{ ticks:{ callback:value=>peso(value) } } }
+      }
+    });
+  }
+</script>
+{% endblock %}

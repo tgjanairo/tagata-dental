@@ -25,71 +25,123 @@
     {% endwith %}
   </div>
 
+  <!-- ONE form wrapping EVERYTHING (so 'branch' submits) -->
   <form method="POST" onsubmit="disableButton()" class="needs-validation" novalidate>
+    {# If you use CSRF: <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> #}
+
+    <!-- Clinic Branch -->
+    <div class="mb-3">
+      <label for="branch" class="form-label fw-bold">Clinic Branch</label>
+      {% set branches = branches or ["Baguio", "Tarlac"] %}
+      {% set current_branch = request.form.get('branch') or '' %}
+      <select id="branch" name="branch" class="form-select" required>
+        <option value="" {{ 'selected' if not current_branch else '' }} disabled>-- Select branch --</option>
+        {% for b in branches %}
+          <option value="{{ b }}" {{ 'selected' if current_branch == b else '' }}>{{ b }}</option>
+        {% endfor %}
+      </select>
+      <div class="invalid-feedback">Please choose a branch.</div>
+    </div>
+
+    <!-- Name -->
     <div class="row mb-3">
       <div class="col-md-4">
         <label for="last_name" class="form-label">Last Name</label>
-        <input type="text" class="form-control" name="last_name" required>
+        <input type="text" class="form-control" name="last_name" value="{{ request.form.get('last_name','') }}" required>
         <div class="invalid-feedback">Required</div>
       </div>
       <div class="col-md-4">
         <label for="first_name" class="form-label">First Name</label>
-        <input type="text" class="form-control" name="first_name" required>
+        <input type="text" class="form-control" name="first_name" value="{{ request.form.get('first_name','') }}" required>
         <div class="invalid-feedback">Required</div>
       </div>
       <div class="col-md-4">
         <label for="middle_name" class="form-label">Middle Name</label>
-        <input type="text" class="form-control" name="middle_name">
+        <input type="text" class="form-control" name="middle_name" value="{{ request.form.get('middle_name','') }}">
       </div>
     </div>
 
+    <!-- Demographics -->
     <div class="row mb-3">
       <div class="col-md-4">
         <label for="birthdate" class="form-label">Birthdate</label>
-        <input type="date" class="form-control" name="birthdate" required>
+        <input type="date" class="form-control" name="birthdate" value="{{ request.form.get('birthdate','') }}" required>
+        <div class="invalid-feedback">Required</div>
       </div>
       <div class="col-md-4">
         <label for="gender" class="form-label">Gender</label>
         <select name="gender" class="form-select" required>
+          {% set g = request.form.get('gender','') %}
           <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
+          <option value="Male" {{ 'selected' if g=='Male' else '' }}>Male</option>
+          <option value="Female" {{ 'selected' if g=='Female' else '' }}>Female</option>
         </select>
+        <div class="invalid-feedback">Required</div>
       </div>
       <div class="col-md-4">
         <label for="contact" class="form-label">Contact Number</label>
-        <input type="text" class="form-control" name="contact" required>
+        <input type="text" class="form-control" name="contact" value="{{ request.form.get('contact','') }}" required>
+        <div class="invalid-feedback">Required</div>
       </div>
     </div>
 
+    <!-- Address -->
     <div class="mb-3">
       <label for="address" class="form-label">Address</label>
-      <input type="text" class="form-control" name="address">
+      <input type="text" class="form-control" name="address" value="{{ request.form.get('address','') }}">
     </div>
 
-    <div class="mb-3">
-      <label for="notes" class="form-label">Notes</label>
-      <textarea class="form-control" name="notes" rows="3"></textarea>
+    <!-- Status + Referred By -->
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label for="status" class="form-label">Status</label>
+        {% set st = request.form.get('status','Single') %}
+        <select id="status" name="status" class="form-select">
+          <option value="Single" {{ 'selected' if st=='Single' else '' }}>Single</option>
+          <option value="Married" {{ 'selected' if st=='Married' else '' }}>Married</option>
+          <option value="Widow" {{ 'selected' if st=='Widow' else '' }}>Widow</option>
+          <option value="Separated" {{ 'selected' if st=='Separated' else '' }}>Separated</option>
+        </select>
+      </div>
+      <div class="col-md-8">
+        <label for="referred_by" class="form-label">Referred By</label>
+        <input
+          type="text"
+          id="referred_by"
+          name="referred_by"
+          class="form-control"
+          placeholder="e.g., Friend, Facebook, Google, Walk-in, Dentist"
+          value="{{ request.form.get('referred_by','') }}"
+        />
+      </div>
     </div>
 
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" name="has_allergy" id="has_allergy">
-      <label class="form-check-label" for="has_allergy">
-        Does this patient have allergies?
-      </label>
+    <!-- Allergies -->
+    {% set has_allergy = request.form.get('has_allergy') == 'on' %}
+    <div class="form-check mb-3 mt-3">
+      <input class="form-check-input" type="checkbox" name="has_allergy" id="has_allergy" {{ 'checked' if has_allergy else '' }}>
+      <label class="form-check-label" for="has_allergy">Does this patient have allergies?</label>
     </div>
 
-    <div class="row mb-3">
+    <div class="mb-3 {{ '' if has_allergy else 'd-none' }}" id="allergyInput">
+      <label class="form-label">List of Allergies</label>
+      <input type="text" class="form-control" name="allergies" value="{{ request.form.get('allergies','') }}">
+      <small class="text-muted">Separate multiple allergies with commas.</small>
+    </div>
+
+    <!-- Company & ID -->
+    <div class="row g-3">
       <div class="col-md-6">
-        <label for="profession" class="form-label">Company</label>
-        <input type="text" class="form-control" name="profession">
+        <label for="company" class="form-label">Company</label>
+        <input type="text" id="company" name="company" class="form-control" value="{{ request.form.get('company','') }}">
       </div>
       <div class="col-md-6">
-        <label for="identification" class="form-label">Identification No.</label>
-        <input type="text" class="form-control" name="identification">
+        <label for="identification_no" class="form-label">Identification No.</label>
+        <input type="text" class="form-control" name="identification_no" value="{{ request.form.get('identification_no','') }}">
       </div>
     </div>
 
+    <!-- Emergency -->
     <div class="mb-3 mt-4">
       <h5 class="text-purple">
         <i class="fas fa-exclamation-triangle text-warning"></i> In Case of Emergency
@@ -98,15 +150,16 @@
 
     <div class="row mb-4">
       <div class="col-md-6">
-        <label for="emergency_contact" class="form-label">Contact Person Name</label>
-        <input type="text" class="form-control" name="emergency_contact">
+        <label for="emergency_contact_name" class="form-label">Contact Person Name</label>
+        <input type="text" class="form-control" name="emergency_contact_name" value="{{ request.form.get('emergency_contact_name','') }}">
       </div>
       <div class="col-md-6">
-        <label for="emergency_number" class="form-label">Contact Number</label>
-        <input type="text" class="form-control" name="emergency_number">
+        <label for="emergency_contact_number" class="form-label">Contact Number</label>
+        <input type="text" class="form-control" name="emergency_contact_number" value="{{ request.form.get('emergency_contact_number','') }}">
       </div>
     </div>
 
+    <!-- Actions -->
     <div class="text-center">
       <button type="submit" id="saveBtn" class="btn btn-primary me-2">
         <i class="fas fa-save"></i> Save
@@ -124,7 +177,16 @@
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
   }
 
-  // Bootstrap form validation
+  // Show/hide allergy input
+  const hasAllergy = document.getElementById("has_allergy");
+  const allergyInput = document.getElementById("allergyInput");
+  if (hasAllergy && allergyInput) {
+    hasAllergy.addEventListener("change", () => {
+      allergyInput.classList.toggle("d-none", !hasAllergy.checked);
+    });
+  }
+
+  // Bootstrap validation
   (() => {
     'use strict';
     const forms = document.querySelectorAll('.needs-validation');

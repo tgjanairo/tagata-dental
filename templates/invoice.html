@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div class="d-flex align-items-center">
+      {% if clinic.logo_path %}
+        <img
+          src="{{ url_for('static', filename=clinic.logo_path.replace('static/', '')) }}"
+          alt="Clinic Logo"
+          style="height:60px; margin-right:15px;"
+        >
+      {% endif %}
+      <div>
+        <h4 class="mb-1">{{ clinic.name }}</h4>
+
+        {# ==== MULTI-ADDRESS + PHONE LINES ==== #}
+        {% if clinic.branches %}
+          {% for b in clinic.branches %}
+            <div class="text-muted small">{{ b.address }} - {{ b.phone }}</div>
+          {% endfor %}
+        {% elif clinic.address %}
+          <div class="text-muted small">{{ clinic.address }}</div>
+          {% if clinic.phone %}
+            <div class="text-muted small">{{ clinic.phone }}</div>
+          {% endif %}
+        {% endif %}
+
+        {% if clinic.email %}
+          <div class="text-muted small">{{ clinic.email }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="text-end">
+      {% if invoice_no %}
+        <div class="small text-muted">Invoice No.</div>
+        <div class="fw-semibold mb-1">{{ invoice_no }}</div>
+      {% endif %}
+      <div class="small text-muted">Statement Date</div>
+      <div class="fw-semibold">{{ today }}</div>
+    </div>
+  </div>
+
+  <!-- Date range filter (optional) -->
+  <form class="row g-2 mb-3" method="GET" action="{{ url_for('invoice_html', patient_id=patient._id) }}">
+    <div class="col-auto">
+      <input type="date" class="form-control form-control-sm" name="from" value="{{ date_from or '' }}">
+    </div>
+    <div class="col-auto">
+      <input type="date" class="form-control form-control-sm" name="to" value="{{ date_to or '' }}">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-sm btn-outline-primary">Apply</button>
+    </div>
+  </form>
+
+  <!-- Patient line -->
+  <div class="mb-2">
+    <strong>Patient:</strong>
+    {{ patient.last_name|upper }}, {{ patient.first_name }}
+    <span class="text-muted ms-2">({{ patient.company or "N/A" }})</span>
+  </div>
+
+  <!-- Items -->
+  <table class="table table-bordered table-striped align-middle">
+    <thead class="table-light">
+      <tr>
+        <th style="width: 140px;">Date</th>
+        <th>Treatment</th>
+        <th class="text-end" style="width: 160px;">Fee</th>
+        <th class="text-end" style="width: 160px;">Paid</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in treatments %}
+      <tr>
+        <td>{{ t.date or "-" }}</td>
+        <td>{{ t.treatment }}</td>
+        <td class="text-end">{{ peso(t.fee|default(0)) }}</td>
+        <td class="text-end">{{ peso(t.paid|default(0)) }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="4" class="text-center text-muted py-4">No records for the selected period.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="2" class="text-end">Total Fee</th>
+        <th class="text-end fw-bold">{{ peso(total_fee) }}</th>
+        <th></th>
+      </tr>
+      <tr>
+        <th colspan="2" class="text-end">Total Paid</th>
+        <th></th>
+        <th class="text-end text-success fw-semibold">{{ peso(total_paid) }}</th>
+      </tr>
+      <tr>
+        <th colspan="2" class="text-end">Balance</th>
+        <th colspan="2"
+            class="text-end fw-bold {% if balance > 0 %}text-danger{% else %}text-success{% endif %}">
+          {{ peso(balance) }}
+        </th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Footer -->
+  <hr>
+  <div class="text-center small text-muted mt-3">
+    Thank you for trusting {{ clinic.name }}.<br>
+    {% if clinic.branches %}
+      {% for b in clinic.branches %}
+        {{ b.address }} - {{ b.phone }}<br>
+      {% endfor %}
+    {% elif clinic.address %}
+      {{ clinic.address }}{% if clinic.phone %} - {{ clinic.phone }}{% endif %}<br>
+    {% endif %}
+    {% if clinic.email %}{{ clinic.email }}{% endif %}
+  </div>
+</div>
+{% endblock %}

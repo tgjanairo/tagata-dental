@@ -1,155 +1,169 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container py-4">
-  <h2 class="fw-bold text-primary mb-4">Welcome, Dr. Tagata</h2>
 
-  <!-- Summary Cards -->
+<div class="container py-3">
+
+  <!-- Heading -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="mb-0 fw-bold text-primary">Welcome, Dr. Tagata</h2>
+  </div>
+
+  <!-- KPI row -->
   <div class="row g-3 mb-4">
+
     <!-- Total Patients -->
     <div class="col-md-3">
-      <div class="card shadow-sm text-white bg-primary rounded-4 p-3 h-100">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div>
-            <div class="fs-3 fw-bold">{{ total_patients }}</div>
-            <div>Total Patients</div>
+      <a href="{{ url_for('list_patients') }}" class="kpi-link text-decoration-none">
+        <div class="card kpi-card bg-primary text-white">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="display-6 fw-bold">{{ total_patients|default(0) }}</div>
+              <div class="fw-semibold">Total Patients</div>
+              <div class="opacity-75 small mt-1">
+                <i class="bi bi-clipboard-check me-1"></i>Up-to-date
+              </div>
+            </div>
+            <i class="bi bi-people-fill fs-1 opacity-75"></i>
           </div>
-          <i class="bi bi-people-fill fs-1 opacity-75"></i>
+          <span class="stretched-link"></span>
         </div>
-        <div class="text-white-50 d-flex align-items-center gap-2">
-          <i class="bi bi-clipboard-check"></i>
-          <small>Up-to-date</small>
-        </div>
-      </div>
+      </a>
     </div>
 
     <!-- Upcoming Appointments -->
     <div class="col-md-3">
-      <div class="card shadow-sm text-dark bg-info rounded-4 p-3 h-100">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div>
-            <div class="fs-3 fw-bold">{{ upcoming_count }}</div>
-            <div>Upcoming Appointments</div>
+      <a href="{{ url_for('calendar') }}" class="kpi-link text-decoration-none">
+        <div class="card kpi-card bg-info text-dark">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="display-6 fw-bold">{{ upcoming_count|default(0) }}</div>
+              <div class="fw-semibold">Upcoming Appointments</div>
+              <div class="small mt-1">
+                <i class="bi bi-calendar2-week me-1"></i>View Calendar
+              </div>
+            </div>
+            <i class="bi bi-calendar-event fs-1 opacity-75"></i>
           </div>
-          <i class="bi bi-calendar-event fs-1 opacity-75"></i>
+          <span class="stretched-link"></span>
         </div>
-        <div class="text-dark d-flex align-items-center gap-2">
-          <i class="bi bi-calendar2-week"></i>
-          <a href="{{ url_for('calendar') }}" class="text-dark text-decoration-none">View Calendar</a>
-        </div>
-      </div>
+      </a>
     </div>
 
-    <!-- Finance Card (Clickable) -->
-<div class="col-md-3">
-  <a href="{{ url_for('finance_report') }}" class="text-decoration-none">
-    <div class="card shadow-sm text-dark bg-warning rounded-4 p-3 h-100">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <div>
-          <div class="fs-5 fw-bold"><i class="bi bi-cash-stack me-1"></i> Finance</div>
-         <ul class="list-unstyled mt-2 mb-0">
-  <li><strong>Revenue:</strong> ₱{{ "{:,.2f}".format(total_fee) }}</li>
-  <li><strong>Paid:</strong> ₱{{ "{:,.2f}".format(total_paid) }}</li>
-  <li><strong>Balance:</strong> ₱{{ "{:,.2f}".format(pending_balance) }}</li>
-</ul>
-        </div>
-        <i class="bi bi-wallet-fill fs-1 opacity-75"></i>
-      </div>
-      <div class="text-dark d-flex align-items-center gap-2 mt-2">
-        <i class="bi bi-arrow-right-circle"></i>
-        <small>View Finance Report</small>
-      </div>
-    </div>
-  </a>
-</div>
-
-    <!-- Upcoming Birthdays -->
+    {% if session.get('user', {}).get('role') == 'admin' %}
+    <!-- Finance (admin only) -->
     <div class="col-md-3">
-      <div class="card shadow-sm text-white bg-success rounded-4 p-3 h-100">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div>
-            <div class="fs-3 fw-bold">{{ birthdays_count }}</div>
-            <div>Upcoming Birthdays</div>
+      <a href="{{ url_for('finance_dashboard') }}" class="kpi-link text-decoration-none">
+        <div class="card kpi-card bg-warning text-dark">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold mb-1">
+                <i class="bi bi-cash-stack me-1"></i>Finance
+              </div>
+              <ul class="list-unstyled mb-0 small">
+                <li><strong>Revenue:</strong> ₱{{ "{:,.2f}".format(total_fee|default(0)) }}</li>
+                <li><strong>Paid:</strong> ₱{{ "{:,.2f}".format(total_paid|default(0)) }}</li>
+                <li><strong>Balance:</strong> ₱{{ "{:,.2f}".format(pending_balance|default(0)) }}</li>
+              </ul>
+            </div>
+            <i class="bi bi-wallet-fill fs-1 opacity-75"></i>
           </div>
-          <i class="bi bi-cake2-fill fs-1 opacity-75"></i>
+          <span class="stretched-link"></span>
         </div>
-        <div class="text-white-50 d-flex align-items-center gap-2">
-          <i class="bi bi-gift"></i>
-          <small>Celebrate</small>
-        </div>
-      </div>
+      </a>
     </div>
+
+    <!-- Outstanding Balances (admin only) -->
+    <div class="col-md-3">
+      <a href="{{ url_for('finance_dashboard') }}" class="text-decoration-none">
+        <div class="card shadow-sm text-white bg-success rounded-4 p-3 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <div class="fs-3 fw-bold">₱{{ "{:,.2f}".format(ar_total|default(0)) }}</div>
+              <div>Outstanding Balances</div>
+            </div>
+            <i class="bi bi-exclamation-circle fs-1 opacity-75"></i>
+          </div>
+          <div class="text-white-50 d-flex align-items-center gap-2">
+            <i class="bi bi-people"></i>
+            <small>{{ ar_patients|default(0) }} patient(s) owing</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+
   </div>
 
-  <!-- Action Buttons -->
-  <div class="mb-4">
-    <a href="{{ url_for('add_patient') }}" class="btn btn-primary me-2">
-      <i class="bi bi-person-plus-fill"></i> Add Patient
+  <!-- Quick actions -->
+  <div class="mt-3 quick-actions d-flex flex-wrap gap-2">
+    <a href="{{ url_for('add_patient') }}" class="btn btn-primary">
+      <i class="bi bi-person-plus me-1"></i> Add Patient
     </a>
     <a href="{{ url_for('add_appointment') }}" class="btn btn-info text-white">
-      <i class="bi bi-calendar-plus"></i> Add Appointment
+      <i class="bi bi-calendar-plus me-1"></i> Add Appointment
     </a>
-    <a href="{{ url_for('add_new_treatment') }}" class="btn btn-outline-primary me-2">
-
-  <i class="bi bi-plus"></i> Add Treatment
-</a>
+    <a href="{{ url_for('add_new_treatment') }}" class="btn btn-outline-primary">
+      <i class="bi bi-clipboard2-plus me-1"></i> Add Treatment
+    </a>
   </div>
 
   <!-- Appointments Today -->
-  <div class="card shadow-sm">
-    <div class="card-header bg-light">
-      <h5 class="mb-0">
-        <i class="bi bi-calendar3 me-1"></i> Appointment Today – {{ current_date }}
-      </h5>
+  <div class="card mt-4 table-card">
+    <div class="card-header d-flex align-items-center gap-2">
+      <i class="bi bi-calendar-check me-1"></i>
+      <strong>Appointments Today — {{ current_date|default('') }}</strong>
     </div>
     <div class="card-body p-0">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Patient Name</th>
-            <th>Dentist</th>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for appt in appointments_today %}
-          <tr>
-            <td>{{ appt.patient_name }}</td>
-            <td>{{ appt.dentist }}</td>
-            <td>{{ appt.time }}</td>
-            <td>
-              <form method="POST" action="{{ url_for('update_appointment_status', appointment_id=appt._id) }}" class="d-flex align-items-center gap-2 mb-0">
-                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                  {% for option in ['Pending', 'Completed', 'Cancelled', 'No Show'] %}
-                  <option value="{{ option }}" {% if appt.status == option %}selected{% endif %}>{{ option }}</option>
-                  {% endfor %}
-                </select>
-                <span class="badge 
-                  {% if appt.status == 'Completed' %} bg-success 
-                  {% elif appt.status == 'Pending' %} bg-warning text-dark 
-                  {% elif appt.status == 'Cancelled' %} bg-danger 
-                  {% elif appt.status == 'No Show' %} bg-secondary 
-                  {% else %} bg-light text-dark 
-                  {% endif %}">
-                  {{ appt.status }}
-                </span>
-              </form>
-            </td>
-            <td>
-              <form method="POST" action="{{ url_for('delete_appointment', appointment_id=appt._id) }}">
-                <button type="submit" class="btn btn-sm btn-outline-danger">
-                  <i class="bi bi-trash3"></i> Delete
-                </button>
-              </form>
-            </td>
-          </tr>
-          {% else %}
-          <tr><td colspan="6" class="text-center">No appointments today.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead>
+            <tr>
+              <th>Patient Name</th>
+              <th>Dentist</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if appointments_today and appointments_today|length > 0 %}
+              {% for a in appointments_today %}
+              <tr>
+                <td>{{ a.patient_name or '—' }}</td>
+                <td>{{ a.dentist or '—' }}</td>
+                <td>{{ a.time or '—' }}</td>
+                <td>
+                  {% set s = (a.status or 'Pending') %}
+                  <span class="badge
+                    {% if s=='Completed' %} bg-success
+                    {% elif s=='Cancelled' %} bg-danger
+                    {% elif s=='No Show' %} bg-secondary
+                    {% else %} bg-warning text-dark {% endif %}">
+                    {{ s }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <a href="{{ url_for('calendar') }}" class="btn btn-sm btn-outline-primary" title="View in calendar">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  No appointments today.
+                  <a href="{{ url_for('add_appointment') }}" class="btn btn-sm btn-primary ms-2">
+                    + Add appointment
+                  </a>
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
+
 </div>
 {% endblock %}
