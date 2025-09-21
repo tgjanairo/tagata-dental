@@ -6,7 +6,7 @@ from io import BytesIO
 
 from flask import (
     Flask, render_template, request, redirect, url_for, flash,
-    session, jsonify, send_file, Response, current_app
+    session, jsonify, send_file, Response, current_app, g
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
@@ -28,8 +28,55 @@ from utils_finance import (
 
 load_dotenv()
 
-app = Flask(__name__)  # must be named "app" for Gunicorn
+app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-me")
+app.config["MONGODB_URI"] = os.environ.get(
+    "MONGODB_URI")  # no localhost fallback in prod
+
+
+def get_db():
+    """Create/cache Mongo client lazily per worker."""
+    if 'db' not in g:
+        uri = app.config.get("MONGODB_URI")
+        if not uri:
+            raise RuntimeError("MONGODB_URI not set")
+        client = MongoClient(uri, serverSelectionTimeoutMS=5000)
+        g._mongo_client = client
+        g.db = client["tagata_dental"]
+        ensure_indexes(g.db)  # safe if called multiple times
+    return g.db
+
+
+def ensure_indexes(db):
+    users_col = db["users"]
+    users_col.create_index([("email", 1)], unique=True, name="uniq_email")
+    # add other indexes here as needed
+    # patients_col = db["patients"]
+    # patients_col.create_index([("last_name", 1), ("first_name", 1)], name="name_idx")
+
+
+@app.get("/health")
+def health():
+    # Keep it light so the app can boot even if DB is momentarily down
+    return "OK", 200
+
+
+@app.get("/")
+def index():
+    # Optional: touch DB to verify connectivity
+    try:
+        db = get_db()
+        return "Tagata Dental running", 200
+    except Exception as e:
+        return f"DB not ready: {e}", 500
+
+
+@app.teardown_appcontext
+def close_db(exc):
+    client = getattr(g, "_mongo_client", None)
+    if client:
+        client.close()
+
 
 # --- Clinic identity shown on invoices ---
 CLINIC = {
