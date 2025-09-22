@@ -1,3 +1,5 @@
+from werkzeug.middleware.proxy_fix import ProxyFix
+from pymongo import MongoClient
 import os
 import re
 from datetime import datetime, timedelta, timezone
@@ -108,12 +110,27 @@ def _to_naive_utc(dt):
 
 
 app = Flask(__name__)
-app.secret_key = "tagata-dental-2025-secret-key"
 
-# ✅ MongoDB setup (dynamic for local + production)
-mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
-client = MongoClient(mongo_uri)
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+
+app.config.update(
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=True,  # App Platform terminates TLS; this is appropriate
+)
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-me")
+
+# Use ONE env var name consistently
+MONGO_URI = os.environ.get("MONGO_URI") or os.environ.get("MONGODB_URI")
+if not MONGO_URI:
+    raise RuntimeError("MONGO_URI (or MONGODB_URI) not set")
+
+client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+
+# Use your intended database name (keep it consistent!)
 db = client["tagata_dental"]
+
+# Collections
 users_col = db["users"]
 patients_col = db["patients"]
 appointments_col = db["appointments"]
@@ -121,10 +138,11 @@ treatments_col = db["treatments"]
 patient_docs_col = db["patient_docs"]
 invoices_col = db["invoices"]
 prescriptions_col = db["prescriptions"]
+
+# Indexes
 users_col.create_index([("email", 1)], unique=True, name="uniq_email")
 treatments_col.create_index([("is_deleted", 1), ("status", 1), ("date", 1)])
 treatments_col.create_index([("patient_id", 1)])
-# ---- indexes for big patient lists ----
 patients_col.create_index(
     [("branch", 1), ("company", 1), ("last_name", 1), ("first_name", 1)],
     name="patient_list_compound",
@@ -132,6 +150,13 @@ patients_col.create_index(
 patients_col.create_index(
     [("last_name", 1), ("first_name", 1)], name="patient_name_sort")
 patients_col.create_index([("contact", 1)], name="contact_exact")
+
+# Optional: confirm connectivity
+try:
+    client.admin.command("ping")
+    print("MongoDB ping: OK")
+except Exception as e:
+    print("MongoDB ping failed:", e)
 
 # ---- Branch config ----
 ALLOWED_BRANCHES = {"Baguio", "Tarlac"}   # add more if you open new branches
